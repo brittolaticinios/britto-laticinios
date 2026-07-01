@@ -2653,74 +2653,47 @@ function atualizarPreco(produtoId, valor) {
         )}
 
         {aba === 'precos' && (
-          <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-            <div style={{ width: 220, background: '#fff', borderRadius: 14, border: '1px solid #e3ecf4', overflow: 'hidden', flexShrink: 0 }}>
-              {dados.clientes.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setClienteEditando(c.id)}
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '12px 16px',
-                    border: 'none',
-                    borderBottom: '1px solid #eef3f8',
-                    background: clienteEditando === c.id ? '#eaf1f7' : '#fff',
-                    color: clienteEditando === c.id ? '#0a4d8c' : '#3a5872',
-                    fontWeight: clienteEditando === c.id ? 700 : 500,
-                    fontSize: 13.5,
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  {c.nomeFantasia}
-                </button>
-              ))}
+  <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e3ecf4', overflow: 'hidden' }}>
+    {dados.produtos.map((p, idx) => {
+      const ehZeroLactose = ['p8', 'p12', 'p16', 'p20'].includes(p.id);
+      const ehLeitePadrao = ['p1', 'p2', 'p3', 'p9', 'p10', 'p11', 'p13', 'p14', 'p15', 'p17', 'p18', 'p19'].includes(p.id);
+      return (
+        <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 18px', borderTop: idx === 0 ? 'none' : '1px solid #eef3f8' }}>
+          <FotoProduto produto={p} size={44} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, color: '#1c3a52', fontWeight: 500 }}>{p.nome}</div>
+            <div style={{ fontSize: 12, color: '#90a6ba' }}>
+              {p.categoria}
+              {ehLeitePadrao && ' · preço sincronizado com Integral/Desnatado/Semidesnatado'}
+              {ehZeroLactose && ' · preço = Integral + R$ 0,50 (automático)'}
             </div>
-
-            <div style={{ flex: 1, background: '#fff', borderRadius: 14, border: '1px solid #e3ecf4', overflow: 'hidden' }}>
-              {!clienteAtual ? (
-                <EmptyState texto="Selecione um cliente para editar os preços." />
-              ) : (
-                dados.produtos.map((p, idx) => {
-                  const ehZeroLactose = ['p8', 'p12', 'p16', 'p20'].includes(p.id);
-                  const ehLeitePadrao = ['p1', 'p2', 'p3', 'p9', 'p10', 'p11', 'p13', 'p14', 'p15', 'p17', 'p18', 'p19'].includes(p.id);
-                  return (
-                    <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 18px', borderTop: idx === 0 ? 'none' : '1px solid #eef3f8', gap: 14 }}>
-                      <FotoProduto produto={p} size={44} />
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 14, color: '#1c3a52', fontWeight: 500 }}>{p.nome}</div>
-                        <div style={{ fontSize: 12, color: '#90a6ba' }}>
-                          {p.categoria}
-                          {ehLeitePadrao && ' · preço sincronizado com Integral/Desnatado/Semidesnatado'}
-                          {ehZeroLactose && ' · preço = Integral + R$ 0,50 (automático)'}
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ fontSize: 14, color: '#5b7691' }}>R$</span>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={clienteAtual.precos[p.id] ?? 0}
-                          disabled={ehZeroLactose}
-                          onChange={(e) => atualizarPreco(clienteAtual.id, p.id, parseFloat(e.target.value) || 0)}
-                          style={{
-                            width: 90,
-                            padding: '7px 10px',
-                            borderRadius: 8,
-                            border: '1.5px solid #d7e3ed',
-                            fontSize: 14,
-                            textAlign: 'right',
-                            fontFamily: 'inherit',
-                            background: ehZeroLactose ? '#f5f8fb' : '#fff',
-                            color: ehZeroLactose ? '#90a6ba' : '#1c3a52',
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })
-              )}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 14, color: '#5b7691' }}>R$</span>
+            <input
+              type="number"
+              step="0.01"
+              value={p.precoPadrao ?? 0}
+              disabled={ehZeroLactose}
+              onChange={(e) => atualizarPreco(p.id, parseFloat(e.target.value) || 0)}
+              style={{
+                width: 90,
+                padding: '7px 10px',
+                borderRadius: 8,
+                border: '1.5px solid #d7e3ed',
+                fontSize: 14,
+                textAlign: 'right',
+                fontFamily: 'inherit',
+                background: ehZeroLactose ? '#f5f8fb' : '#fff',
+                color: ehZeroLactose ? '#90a6ba' : '#1c3a52',
+              }}
+            />
+          </div>
+        </div>
+      );
+    })}
+  </div>
+)}
             </div>
           </div>
         )}
