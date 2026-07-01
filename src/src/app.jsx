@@ -2507,7 +2507,7 @@ function atualizarPreco(produtoId, valor) {
     return { ...prev, produtos: novosProdutos };
   });
 }
-  }
+  
 
   function marcarConfirmado(pedidoId) {
     setDados((prev) => ({
