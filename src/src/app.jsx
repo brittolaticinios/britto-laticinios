@@ -2694,9 +2694,7 @@ function atualizarPreco(produtoId, valor) {
     })}
   </div>
 )}
-            </div>
-          </div>
-        )}
+           
 
         {aba === 'clientes' && (
           <div>
