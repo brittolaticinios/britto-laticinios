@@ -1732,7 +1732,7 @@ function PainelCliente({ cliente, produtos, industrias, onSair, onTrocarCliente,
 
   const itensCarrinho = Object.entries(carrinho).map(([pid, qtd]) => {
     const produto = produtos.find((p) => p.id === pid);
-    const preco = cliente.precos[pid] ?? 0;
+    const preco = produto?.precoPadrao ?? 0;
     return { produto, qtd, preco, subtotal: preco * qtd };
   });
   const totalCarrinho = itensCarrinho.reduce((s, i) => s + i.subtotal, 0);
