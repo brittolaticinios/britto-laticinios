@@ -2477,22 +2477,36 @@ function PainelAdmin({ dados, setDados, onSair }) {
     { padrao: ['p17', 'p18', 'p19'], zeroLactose: 'p20' }, // Dália Alimentos
   ];
 
-  function atualizarPreco(clienteId, produtoId, valor) {
-    setDados((prev) => {
-      const novoClientes = prev.clientes.map((c) => {
-        if (c.id !== clienteId) return c;
-        const novosPrecos = { ...c.precos, [produtoId]: valor };
-        const grupo = GRUPOS_LEITE_PADRAO.find((g) => g.padrao.includes(produtoId));
-        if (grupo) {
-          grupo.padrao.forEach((pid) => { novosPrecos[pid] = valor; });
-          novosPrecos[grupo.zeroLactose] = Math.round((valor + DIFERENCA_ZERO_LACTOSE) * 100) / 100;
-        }
-        return { ...c, precos: novosPrecos };
-      });
-      const clienteAtualizado = novoClientes.find((c) => c.id === clienteId);
-      salvarClienteNoBanco(clienteAtualizado).catch((e) => console.error('Erro ao salvar preço:', e));
-      return { ...prev, clientes: novoClientes };
+  async function salvarProdutosNoBanco(produtos) {
+  await supabaseUpsert('produtos', produtos.map((p) => ({
+    id: p.id,
+    nome: p.nome,
+    categoria: p.categoria,
+    validade_dias: p.validadeDias,
+    validade_obs: p.validadeObs,
+    foto: p.foto,
+    industria_id: p.industriaId,
+    tampa: p.tampa,
+    preco_padrao: p.precoPadrao,
+  })));
+}
+
+function atualizarPreco(produtoId, valor) {
+  setDados((prev) => {
+    const novosProdutos = prev.produtos.map((p) => {
+      const grupo = GRUPOS_LEITE_PADRAO.find((g) => g.padrao.includes(produtoId) || g.zeroLactose === produtoId);
+      if (grupo) {
+        if (grupo.padrao.includes(p.id)) return { ...p, precoPadrao: valor };
+        if (p.id === grupo.zeroLactose) return { ...p, precoPadrao: Math.round((valor + DIFERENCA_ZERO_LACTOSE) * 100) / 100 };
+        return p;
+      }
+      if (p.id === produtoId) return { ...p, precoPadrao: valor };
+      return p;
     });
+    salvarProdutosNoBanco(novosProdutos).catch((e) => console.error('Erro ao salvar preço:', e));
+    return { ...prev, produtos: novosProdutos };
+  });
+}
   }
 
   function marcarConfirmado(pedidoId) {
