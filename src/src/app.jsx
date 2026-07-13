@@ -49,19 +49,91 @@ const INDUSTRIAS_INICIAIS = [
     kgPorPalletAprox: 1000,
     pesoMinimoKgPorPedido: 500,
     corSelo: { bg: '#1c4f9c', texto: '#ffe066' }, // azul com amarelo, como a marca Lac
-    regraCarga: 'Mínimo de 1.000 kg por CNPJ',
+    regraCarga: 'Mínimo de 1.000 kg por CNPJ · Peça: ~4 kg (aprox.) · Caixa: 6 peças',
   },
   {
     id: 'ind6',
     nome: 'Las Tres Ninas',
     tipoVenda: 'peso', // vendido por kg, peso variável — igual ao Lac
-    pecasPorCaixa: 8,
-    kgPorPecaAprox: 2.6, // peça varia entre 2,4kg e 2,8kg
-    caixasPorPallet: 48, // aproximação: ~1000kg / (8 peças x 2,6kg)
+    pecasPorCaixa: 6,
+    kgPorPecaAprox: 2.6,
+    caixasPorPallet: 64, // aproximação: ~1000kg / (6 peças x 2,6kg)
     kgPorPalletAprox: 1000,
     pesoMinimoKgPorPedido: 12000,
     corSelo: { bg: '#a8326b', texto: '#ffe066' }, // rosa/magenta com amarelo
-    regraCarga: 'Mínimo de 12.000 kg por CNPJ · Peça: 2,4 a 2,8 kg (aprox.) · Caixa: 8 peças',
+    regraCarga: 'Mínimo de 12.000 kg por CNPJ · Peça: ~2,6 kg (aprox.) · Caixa: 6 peças',
+  },
+  {
+    id: 'ind7',
+    nome: 'Gran Filata',
+    tipoVenda: 'peso', // vendido por kg, peso variável
+    pecasPorCaixa: 6,
+    kgPorPecaAprox: 4,
+    caixasPorPallet: 42, // aproximação: ~1000kg / (6 peças x 4kg)
+    kgPorPalletAprox: 1000,
+    pesoMinimoKgPorPedido: 500,
+    corSelo: { bg: '#0f6e6a', texto: '#ffe066' }, // verde-azulado com amarelo
+    regraCarga: 'Peça: ~4 kg (aprox.) · Caixa: 6 peças',
+  },
+  {
+    id: 'ind8',
+    nome: 'Amanhecer - Creme de Leite',
+    unidadesPorCaixa: 27,
+    caixasPorPallet: 165,
+    pallettesMinimoPorPedido: 14,
+    corSelo: { bg: '#4a9d6b', texto: '#ffe066' }, // verde mais claro, ligado ao Amanhecer
+    regraCarga: 'Venda paletizada · Caixa: 27 unidades · Pallet: 165 caixas',
+  },
+  {
+    id: 'ind9',
+    nome: 'Natville',
+    unidadesPorCaixa: 12,
+    caixasPorPallet: 85,
+    pallettesMinimoPorPedido: 14,
+    corSelo: { bg: '#c2410c', texto: '#ffffff' }, // laranja queimado
+    regraCarga: 'Carreta: 28 pallets · venda paletizada',
+  },
+  {
+    id: 'ind10',
+    nome: 'Natville - Creme de Leite',
+    unidadesPorCaixa: 27,
+    caixasPorPallet: 165,
+    pallettesMinimoPorPedido: 14,
+    corSelo: { bg: '#d97706', texto: '#ffffff' }, // âmbar, ligado à Natville
+    regraCarga: 'Venda paletizada · Caixa: 27 unidades · Pallet: 165 caixas',
+  },
+  {
+    id: 'ind11',
+    nome: 'Natville - Leite Condensado',
+    unidadesPorCaixa: 27,
+    caixasPorPallet: 105,
+    pallettesMinimoPorPedido: 14,
+    corSelo: { bg: '#92400e', texto: '#ffffff' }, // âmbar escuro, ligado à Natville
+    regraCarga: 'Venda paletizada · Caixa: 27 unidades · Pallet: 105 caixas',
+  },
+  {
+    id: 'ind12',
+    nome: 'Dália Alimentos - Frios',
+    tipoVenda: 'peso', // vendido por kg, caixas fechadas de ~20kg
+    pecasPorCaixa: 1,
+    kgPorPecaAprox: 20,
+    caixasPorPallet: 50, // aproximação: 1000kg / 20kg por caixa
+    kgPorPalletAprox: 1000,
+    pesoMinimoKgPorPedido: 1000, // venda paletizada: mínimo 1 pallet fechado
+    corSelo: { bg: '#8a6bc0', texto: '#ffe066' }, // roxo mais claro, ligado ao Dália
+    regraCarga: 'Venda paletizada · Caixa: ~20 kg (aprox.) · Pallet: ~1.000 kg',
+  },
+  {
+    id: 'ind13',
+    nome: 'Parlak',
+    tipoVenda: 'peso', // vendido por kg, peso variável — igual ao Lac/Gran Filata
+    pecasPorCaixa: 6,
+    kgPorPecaAprox: 4,
+    caixasPorPallet: 42, // aproximação: ~1000kg / (6 peças x 4kg) — confirmar com o fornecedor
+    kgPorPalletAprox: 1000,
+    pesoMinimoKgPorPedido: 500,
+    corSelo: { bg: '#b8860b', texto: '#ffffff' }, // dourado escuro
+    regraCarga: 'Peça: ~4 kg (aprox.) · Caixa: 6 peças',
   },
 ];
 
@@ -70,28 +142,38 @@ const INDUSTRIAS_INICIAIS = [
 // ou depois, link do Supabase Storage quando migrarmos pra lá).
 // Enquanto "foto" estiver null, o app mostra um ícone de placeholder colorido no lugar.
 const PRODUTOS_BASE = [
-  { id: 'p1', nome: 'Leite UHT Integral 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind1', tampa: true, precoPadrao: 4.20 },
-  { id: 'p2', nome: 'Leite UHT Desnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind1', tampa: true, precoPadrao: 4.20 },
-  { id: 'p3', nome: 'Leite UHT Semidesnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind1', tampa: true, precoPadrao: 4.20 },
-  { id: 'p8', nome: 'Leite UHT Semidesnatado Zero Lactose 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind1', tampa: true, precoPadrao: 4.70 },
-  { id: 'p9', nome: 'Leite UHT Integral 1L sem Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind2', tampa: false, precoPadrao: 4.10 },
-  { id: 'p10', nome: 'Leite UHT Desnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind2', tampa: true, precoPadrao: 4.10 },
-  { id: 'p11', nome: 'Leite UHT Semidesnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind2', tampa: true, precoPadrao: 4.10 },
-  { id: 'p12', nome: 'Leite UHT Semidesnatado Zero Lactose 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind2', tampa: true, precoPadrao: 4.60 },
-  { id: 'p13', nome: 'Leite UHT Integral 1L sem Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind3', tampa: false, precoPadrao: 4.15 },
-  { id: 'p14', nome: 'Leite UHT Desnatado 1L sem Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind3', tampa: false, precoPadrao: 4.15 },
-  { id: 'p15', nome: 'Leite UHT Semidesnatado 1L sem Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind3', tampa: false, precoPadrao: 4.15 },
-  { id: 'p16', nome: 'Leite UHT Semidesnatado Zero Lactose 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind3', tampa: true, precoPadrao: 4.65 },
-  { id: 'p17', nome: 'Leite UHT Integral 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind4', tampa: true, precoPadrao: 4.25 },
-  { id: 'p18', nome: 'Leite UHT Desnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind4', tampa: true, precoPadrao: 4.25 },
-  { id: 'p19', nome: 'Leite UHT Semidesnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind4', tampa: true, precoPadrao: 4.25 },
-  { id: 'p20', nome: 'Leite UHT Semidesnatado Zero Lactose 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind4', tampa: true, precoPadrao: 4.75 },
-  { id: 'p21', nome: 'Queijo Mussarela LAC (peso variável)', categoria: 'Queijo Mussarela', validadeDias: 90, validadeObs: 'a partir da data de fabricação', foto: null, industriaId: 'ind5', precoPadrao: 26.50 },
+  { id: 'p1', nome: 'Leite UHT Integral 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind1', tampa: true, precoPadrao: 5.35 },
+  { id: 'p2', nome: 'Leite UHT Desnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind1', tampa: true, precoPadrao: 5.35 },
+  { id: 'p3', nome: 'Leite UHT Semidesnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind1', tampa: true, precoPadrao: 5.35 },
+  { id: 'p8', nome: 'Leite UHT Semidesnatado Zero Lactose 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind1', tampa: true, precoPadrao: 5.85 },
+  { id: 'p9', nome: 'Leite UHT Integral 1L sem Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind2', tampa: false, precoPadrao: 5.09 },
+  { id: 'p10', nome: 'Leite UHT Desnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind2', tampa: true, precoPadrao: 5.09 },
+  { id: 'p11', nome: 'Leite UHT Semidesnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind2', tampa: true, precoPadrao: 5.09 },
+  { id: 'p12', nome: 'Leite UHT Semidesnatado Zero Lactose 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind2', tampa: true, precoPadrao: 5.59 },
+  { id: 'p13', nome: 'Leite UHT Integral 1L sem Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind3', tampa: false, precoPadrao: 4.99 },
+  { id: 'p14', nome: 'Leite UHT Desnatado 1L sem Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind3', tampa: false, precoPadrao: 4.99 },
+  { id: 'p15', nome: 'Leite UHT Semidesnatado 1L sem Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind3', tampa: false, precoPadrao: 4.99 },
+  { id: 'p16', nome: 'Leite UHT Semidesnatado Zero Lactose 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind3', tampa: true, precoPadrao: 5.49 },
+  { id: 'p17', nome: 'Leite UHT Integral 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind4', tampa: true, precoPadrao: 5.45 },
+  { id: 'p18', nome: 'Leite UHT Desnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind4', tampa: true, precoPadrao: 5.45 },
+  { id: 'p19', nome: 'Leite UHT Semidesnatado 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind4', tampa: true, precoPadrao: 5.45 },
+  { id: 'p20', nome: 'Leite UHT Semidesnatado Zero Lactose 1L com Tampa', categoria: 'Leite UHT', validadeDias: 120, foto: null, industriaId: 'ind4', tampa: true, precoPadrao: 5.95 },
+  { id: 'p21', nome: 'Queijo Mussarela LAC (peso variável)', categoria: 'Queijo Mussarela', validadeDias: 90, validadeObs: 'a partir da data de fabricação', foto: null, industriaId: 'ind5', precoPadrao: 34.99 },
   { id: 'p22', nome: 'Queijo Prato Las Tres Ninas (peso variável)', categoria: 'Queijo Prato', validadeDias: 180, foto: null, industriaId: 'ind6', precoPadrao: 31.99 },
-  { id: 'p4', nome: 'Queijo Mussarela Fatiado 1kg', categoria: 'Queijo Mussarela', validadeDias: 45, foto: null, industriaId: null, precoPadrao: 28.50 },
-  { id: 'p5', nome: 'Queijo Prato Fatiado 1kg', categoria: 'Queijo Prato', validadeDias: 45, foto: null, industriaId: null, precoPadrao: 27.00 },
-  { id: 'p6', nome: 'Queijo Minas Frescal 500g', categoria: 'Queijos', validadeDias: 20, foto: null, industriaId: null, precoPadrao: 19.90 },
-  { id: 'p7', nome: 'Requeijão Cremoso 200g', categoria: 'Queijos', validadeDias: 60, foto: null, industriaId: null, precoPadrao: 9.50 },
+  { id: 'p23', nome: 'Mussarela Gran Filata (peso variável)', categoria: 'Queijo Mussarela', foto: null, industriaId: 'ind7', unidadeVenda: 'kg', precoPadrao: 34.99 },
+  { id: 'p24', nome: 'Creme de Leite 10% Gordura', categoria: 'Creme de Leite', foto: null, industriaId: 'ind8', precoPadrao: 2.09 },
+  { id: 'p25', nome: 'Creme de Leite 17% Gordura', categoria: 'Creme de Leite', foto: null, industriaId: 'ind8', precoPadrao: 2.39 },
+  { id: 'p26', nome: 'Leite UHT Integral 1L', categoria: 'Leite UHT', foto: null, industriaId: 'ind9', precoPadrao: 5.79 },
+  { id: 'p27', nome: 'Leite UHT Desnatado 1L', categoria: 'Leite UHT', foto: null, industriaId: 'ind9', precoPadrao: 5.79 },
+  { id: 'p28', nome: 'Leite UHT Semidesnatado 1L', categoria: 'Leite UHT', foto: null, industriaId: 'ind9', precoPadrao: 5.79 },
+  { id: 'p29', nome: 'Leite UHT Semidesnatado Zero Lactose 1L', categoria: 'Leite UHT', foto: null, industriaId: 'ind9', precoPadrao: 6.29 },
+  { id: 'p30', nome: 'Creme de Leite 15% Gordura', categoria: 'Creme de Leite', foto: null, industriaId: 'ind10', precoPadrao: 2.49 },
+  { id: 'p31', nome: 'Leite Condensado Semidesnatado', categoria: 'Leite Condensado', foto: null, industriaId: 'ind11', precoPadrao: 5.09 },
+  { id: 'p32', nome: 'Calabresa Reta', categoria: 'Embutidos', foto: null, industriaId: 'ind12', precoPadrao: 18.90 },
+  { id: 'p33', nome: 'Bacon Manta Especial', categoria: 'Embutidos', foto: null, industriaId: 'ind12', precoPadrao: 21.90 },
+  { id: 'p34', nome: 'Bacon Paleta Extra', categoria: 'Embutidos', foto: null, industriaId: 'ind12', precoPadrao: 18.90 },
+  { id: 'p35', nome: 'Mussarela Parlak (peso variável)', categoria: 'Queijo Mussarela', foto: null, industriaId: 'ind13', precoPadrao: 36.99 },
+  { id: 'p36', nome: 'Queijo Prato Parlak (peso variável)', categoria: 'Queijo Prato', foto: null, industriaId: 'ind13', precoPadrao: 38.99 },
 ];
 
 // Vendedores/representantes da Britto Laticínios. Cada um tem login próprio e
@@ -578,11 +660,14 @@ const CLIENTES_INICIAIS = [
     vendedorId: 'v6',
     precos: { p1: 4.20, p2: 4.20, p3: 4.20, p8: 4.70, p9: 4.10, p10: 4.10, p11: 4.10, p12: 4.60, p13: 4.15, p14: 4.15, p15: 4.15, p16: 4.65, p17: 4.25, p18: 4.25, p19: 4.25, p20: 4.75, p21: 26.50, p4: 28.50, p5: 27.00, p6: 19.90, p7: 9.50 },
   },
+  { id: 'c48', usuario: 'reluzjockey', senha: '1234', nomeFantasia: 'Supermercado Reluz Jockey Ltda', cnpj: '50.790.829/0001-03', prazoPagamento: '14/21/28 dias', vendedorId: 'v5', precos: { p1: 4.20, p2: 4.20, p3: 4.20, p8: 4.70, p9: 4.10, p10: 4.10, p11: 4.10, p12: 4.60, p13: 4.15, p14: 4.15, p15: 4.15, p16: 4.65, p17: 4.25, p18: 4.25, p19: 4.25, p20: 4.75, p21: 26.50, p4: 28.50, p5: 27.00, p6: 19.90, p7: 9.50 } },
+  { id: 'c49', usuario: 'pavaniajuda', senha: '1234', nomeFantasia: 'Pavani do bairro Ajuda', cnpj: '08.472.686/0002-06', prazoPagamento: '28 dias', vendedorId: 'v5', precos: { p1: 4.20, p2: 4.20, p3: 4.20, p8: 4.70, p9: 4.10, p10: 4.10, p11: 4.10, p12: 4.60, p13: 4.15, p14: 4.15, p15: 4.15, p16: 4.65, p17: 4.25, p18: 4.25, p19: 4.25, p20: 4.75, p21: 26.50, p4: 28.50, p5: 27.00, p6: 19.90, p7: 9.50 } },
 ];
 
 const ADMIN_LOGIN = { usuario: 'britto', senha: 'britto2026' };
 const WHATSAPP_VENDAS = '5522998145979';
 const WHATSAPP_FINANCEIRO = '5522999748356';
+const NOTA_TABELA_PRECO = 'Preço sujeito à alteração conforme disponibilidade. Favor sempre consultar o vendedor antes de passar o pedido.';
 
 // ---------- CONEXÃO COM O BANCO DE DADOS (SUPABASE) ----------
 const SUPABASE_URL = 'https://cqwnilcejpqqkekeuozn.supabase.co';
@@ -660,6 +745,9 @@ async function loadData() {
     unidadesPorCaixa: i.unidades_por_caixa,
     caixasPorPallet: i.caixas_por_pallet,
     pallettesMinimoPorPedido: i.pallets_minimo_pedido,
+    pecasPorCaixa: i.pecas_por_caixa,
+    kgPorPecaAprox: i.kg_por_peca_aprox,
+    kgPorPalletAprox: i.kg_por_pallet_aprox,
     pesoMinimoKgPorPedido: i.peso_minimo_kg_pedido,
     corSelo: { bg: i.cor_selo_bg, texto: i.cor_selo_texto },
     regraCarga: i.regra_carga,
@@ -674,6 +762,7 @@ async function loadData() {
     foto: p.foto,
     industriaId: p.industria_id,
     tampa: p.tampa,
+    unidadeVenda: p.unidade_venda,
     precoPadrao: p.preco_padrao,
   }));
 
@@ -740,6 +829,25 @@ async function salvarClienteNoBanco(cliente) {
   }
 }
 
+// Salva (cria ou atualiza) uma indústria/fornecedor no banco.
+async function salvarIndustriaNoBanco(industria) {
+  await supabaseUpsert('industrias', [{
+    id: industria.id,
+    nome: industria.nome,
+    tipo_venda: industria.tipoVenda || 'pallet',
+    unidades_por_caixa: industria.unidadesPorCaixa ?? null,
+    caixas_por_pallet: industria.caixasPorPallet ?? null,
+    pallets_minimo_pedido: industria.pallettesMinimoPorPedido ?? null,
+    pecas_por_caixa: industria.pecasPorCaixa ?? null,
+    kg_por_peca_aprox: industria.kgPorPecaAprox ?? null,
+    kg_por_pallet_aprox: industria.kgPorPalletAprox ?? null,
+    peso_minimo_kg_pedido: industria.pesoMinimoKgPorPedido ?? null,
+    cor_selo_bg: industria.corSelo?.bg ?? null,
+    cor_selo_texto: industria.corSelo?.texto ?? null,
+    regra_carga: industria.regraCarga ?? null,
+  }]);
+}
+
 // Salva (cria ou atualiza) um vendedor no banco.
 async function salvarVendedorNoBanco(vendedor) {
   await supabaseUpsert('vendedores', [{
@@ -777,11 +885,12 @@ async function salvarPedidoNoBanco(pedido) {
 
 // Atualiza o status de um pedido (ex: 'novo' -> 'confirmado').
 async function atualizarStatusPedidoNoBanco(pedidoId, status) {
-  await fetch(`${SUPABASE_URL}/rest/v1/pedidos?id=eq.${encodeURIComponent(pedidoId)}`, {
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/pedidos?id=eq.${encodeURIComponent(pedidoId)}`, {
     method: 'PATCH',
     headers: supabaseHeaders,
     body: JSON.stringify({ status }),
   });
+  if (!resp.ok) throw new Error(`Erro ao atualizar status do pedido: ${resp.status}`);
 }
 
 // Remove um cliente do banco.
@@ -792,6 +901,11 @@ async function removerClienteDoBanco(clienteId) {
 // Remove um vendedor do banco.
 async function removerVendedorDoBanco(vendedorId) {
   await supabaseDelete('vendedores', vendedorId);
+}
+
+// Remove um produto do banco.
+async function removerProdutoDoBanco(produtoId) {
+  await supabaseDelete('produtos', produtoId);
 }
 
 // Retorna a indústria de um produto, ou null se não tiver (produto sem regra de pallet)
@@ -812,13 +926,33 @@ function ehVendidoPorPeso(industria) {
   return industria && industria.tipoVenda === 'peso';
 }
 
+// Verifica se um produto especifico e vendido por peso (kg): tanto pela industria
+// dele (ex: Lac, Las Tres Ninas) quanto por uma marcacao direto no produto
+// (produto.unidadeVenda === 'kg'), usada em produtos sem industria vinculada.
+function produtoEhPorPeso(produto, industria) {
+  return ehVendidoPorPeso(industria) || (produto && produto.unidadeVenda === 'kg');
+}
+
+// Define a ordem de exibicao por categoria de produto: leite longa vida primeiro,
+// depois creme de leite, depois leite condensado, e por ultimo queijos/mussarela.
+// Usado para que a tabela de precos siga sempre essa mesma sequencia, tanto nos
+// grupos com venda ativa quanto nos com venda suspensa.
+function categoriaGrupoRank(produtos) {
+  const cat = (produtos && produtos[0]) ? (produtos[0].categoria || '') : '';
+  if (cat.includes('Leite UHT')) return 0;
+  if (cat.includes('Creme de Leite')) return 1;
+  if (cat.includes('Leite Condensado')) return 2;
+  if (cat.includes('Queijo')) return 3;
+  return 4;
+}
+
 // Descreve a quantidade de um item de pedido já salvo: em kg para produtos vendidos
 // por peso, em pallets se o produto tiver indústria de pallet fechado, ou em unidades
 // soltas caso contrário.
 function descreverQtdItem(item, produtos, industrias) {
   const produto = produtos.find((p) => p.id === item.produtoId);
   const industria = produto ? getIndustriaDoProduto(produto, industrias) : null;
-  if (ehVendidoPorPeso(industria)) {
+  if (produtoEhPorPeso(produto, industria)) {
     return `${item.qtd} kg`;
   }
   if (industria) {
@@ -896,6 +1030,12 @@ const Icon = {
       <path d="M3 12.6v-2a4 4 0 0 1 4-4h14" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M7 21.9l-4-4 4-4" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M21 11.4v2a4 4 0 0 1-4 4H3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  Download: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...p}>
+      <path d="M12 3v12m0 0-4-4m4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
 };
@@ -1337,6 +1477,8 @@ function construirPDFSimples(linhas) {
       conteudoStream += `1 0 0 1 ${margemEsquerda} ${y} Tm\n`;
       conteudoStream += `(${escaparTextoPDF(removerAcentos(linha.texto || ''))}) Tj\n`;
       if (linha.precoTexto) {
+        const corPreco = linha.corPreco ? linha.corPreco.split(' ').map(Number) : cor;
+        conteudoStream += `${corPreco[0]} ${corPreco[1]} ${corPreco[2]} rg\n`;
         conteudoStream += `1 0 0 1 ${colunaPrecoX} ${y} Tm\n`;
         conteudoStream += `(${escaparTextoPDF(linha.precoTexto)}) Tj\n`;
       }
@@ -1379,10 +1521,19 @@ function TabelaPrecosGeral({ dados, onFechar }) {
     produtosPorIndustria[chave].push(p);
   });
 
+  // Grupos com venda suspensa (todos os itens zerados) vao pro final da lista,
+  // deixando os grupos com venda ativa sempre visiveis primeiro.
   const gruposOrdenados = [
     ...dados.industrias.map((ind) => ({ industria: ind, produtos: produtosPorIndustria[ind.id] || [] })),
     { industria: null, produtos: produtosPorIndustria['sem-industria'] || [] },
-  ].filter((g) => g.produtos.length > 0);
+  ]
+    .filter((g) => g.produtos.length > 0)
+    .sort((a, b) => {
+      const suspA = a.industria && a.produtos.every((p) => (p.precoPadrao ?? 0) === 0) ? 1 : 0;
+      const suspB = b.industria && b.produtos.every((p) => (p.precoPadrao ?? 0) === 0) ? 1 : 0;
+      if (suspA !== suspB) return suspA - suspB;
+      return categoriaGrupoRank(a.produtos) - categoriaGrupoRank(b.produtos);
+    });
 
   function montarTextoTabela() {
     const hoje = new Date().toLocaleDateString('pt-BR');
@@ -1393,10 +1544,11 @@ function TabelaPrecosGeral({ dados, onFechar }) {
         texto += `_${industria.regraCarga}_\n`;
       }
       produtos.forEach((p) => {
-        const unidade = ehVendidoPorPeso(industria) ? '/kg' : '/un';
+        const unidade = produtoEhPorPeso(p, industria) ? '/kg' : '/un';
         texto += `• ${p.nome}: ${fmtMoeda(p.precoPadrao ?? 0)} ${unidade}\n`;
       });
     });
+    texto += `\n\n*${NOTA_TABELA_PRECO}*`;
     return texto;
   }
 
@@ -1442,13 +1594,17 @@ function TabelaPrecosGeral({ dados, onFechar }) {
         linhas.push({ texto: removerAcentos(industria.regraCarga), tamanho: 9, cor: '0.4 0.4 0.4' });
       }
       produtos.forEach((p) => {
-        const unidade = ehVendidoPorPeso(industria) ? '/kg' : '/un';
+        const unidade = produtoEhPorPeso(p, industria) ? '/kg' : '/un';
         const nomeLimpo = removerAcentos(p.nome);
         const precoTxt = removerAcentos(`${fmtMoeda(p.precoPadrao ?? 0)} ${unidade}`);
         linhas.push({ texto: `${nomeLimpo}`, precoTexto: precoTxt, tamanho: 10 });
       });
       linhas.push({ texto: '', tamanho: 6 });
     });
+
+    linhas.push({ texto: '', tamanho: 4 });
+    linhas.push({ texto: removerAcentos('Preço sujeito à alteração conforme disponibilidade.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
+    linhas.push({ texto: removerAcentos('Favor sempre consultar o vendedor antes de passar o pedido.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
 
     const pdfBytes = construirPDFSimples(linhas);
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
@@ -1475,12 +1631,15 @@ function TabelaPrecosGeral({ dados, onFechar }) {
 
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '28px 20px 60px' }}>
         <div style={{ display: 'flex', gap: 10, marginBottom: 22, flexWrap: 'wrap' }}>
-          <button
-            onClick={enviarTabelaPeloWhatsApp}
-            style={{ display: 'flex', alignItems: 'center', gap: 7, background: '#1c8a4b', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 16px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(montarTextoTabela())}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => { try { navigator.clipboard.writeText(montarTextoTabela()); } catch (e) {} }}
+            style={{ display: 'flex', alignItems: 'center', gap: 7, background: '#1c8a4b', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 16px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
           >
-            <Icon.WhatsApp width={15} height={15} /> {textoCopiadoParaEnvio ? 'Copiado! Cole no WhatsApp' : 'Enviar tabela'}
-          </button>
+            <Icon.WhatsApp width={15} height={15} /> Enviar tabela
+          </a>
           <button
             onClick={copiarTexto}
             style={{ display: 'flex', alignItems: 'center', gap: 7, background: '#eaf1f7', color: '#0a4d8c', border: 'none', borderRadius: 9, padding: '10px 16px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
@@ -1530,7 +1689,7 @@ function TabelaPrecosGeral({ dados, onFechar }) {
               )}
               <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e3ecf4', overflow: 'hidden' }}>
                 {produtos.map((p, idx) => {
-                  const unidade = ehVendidoPorPeso(industria) ? '/ kg' : '/ un';
+                  const unidade = produtoEhPorPeso(p, industria) ? '/ kg' : '/ un';
                   return (
                     <div
                       key={p.id}
@@ -1552,6 +1711,12 @@ function TabelaPrecosGeral({ dados, onFechar }) {
               </div>
             </div>
           ))}
+
+          <div style={{ marginTop: 24, padding: '14px 16px', background: '#fff4e0', borderRadius: 10, border: '1px solid #f0d090' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#92400e', lineHeight: 1.5 }}>
+              {NOTA_TABELA_PRECO}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1686,7 +1851,7 @@ function PainelCliente({ cliente, produtos, industrias, onSair, onTrocarCliente,
   function alterarQtd(produto, delta) {
     const industria = getIndustriaDoProduto(produto, industrias);
     let passo = 1;
-    if (ehVendidoPorPeso(industria)) passo = 10;
+    if (produtoEhPorPeso(produto, industria)) passo = 10;
     else if (industria) passo = unidadesPorPallet(industria);
     setCarrinho((prev) => {
       const atual = prev[produto.id] || 0;
@@ -1702,7 +1867,7 @@ function PainelCliente({ cliente, produtos, industrias, onSair, onTrocarCliente,
   // pallets (produtos com indústria de pallet fechado), ou em unidades (demais produtos).
   function definirQtdDigitada(produto, valorDigitado) {
     const industria = getIndustriaDoProduto(produto, industrias);
-    if (ehVendidoPorPeso(industria)) {
+    if (produtoEhPorPeso(produto, industria)) {
       // Aceita números decimais (ex: 512.5 kg), trocando vírgula por ponto se necessário.
       const numero = Math.max(0, parseFloat(String(valorDigitado).replace(',', '.')) || 0);
       setCarrinho((prev) => {
@@ -1762,7 +1927,9 @@ function PainelCliente({ cliente, produtos, industrias, onSair, onTrocarCliente,
   // faturamento por fornecedor, e evita confusão entre marcas diferentes no mesmo pedido.
   const industriasNoCarrinho = Object.values(resumoPorIndustria).map((r) => r.industria);
   const misturaIndustrias = industriasNoCarrinho.length > 1;
-  const pedidoBloqueado = industriasAbaixoDoMinimo.length > 0 || misturaIndustrias;
+  // Regra de pedido mínimo (pallets/kg) NÃO bloqueia mais o envio — fica só como aviso
+  // informativo na tela (industriasAbaixoDoMinimo continua sendo usado pra mostrar o texto).
+  const pedidoBloqueado = misturaIndustrias;
 
   function montarTextoWhatsApp() {
     let texto = vendedor
@@ -1770,8 +1937,8 @@ function PainelCliente({ cliente, produtos, industrias, onSair, onTrocarCliente,
       : `Olá! Sou da *${cliente.nomeFantasia}* (CNPJ: ${cliente.cnpj}) — Pedido nº ${String(proximoNumeroPedido).padStart(4, '0')}\n\n`;
     itensCarrinho.forEach((i) => {
       const industria = getIndustriaDoProduto(i.produto, industrias);
-      if (ehVendidoPorPeso(industria)) {
-        texto += `• [${industria.nome}] ${i.produto.nome} — ${i.qtd} kg — ${fmtMoeda(i.preco)}/kg = ${fmtMoeda(i.subtotal)}\n`;
+      if (produtoEhPorPeso(i.produto, industria)) {
+        texto += `• ${industria ? `[${industria.nome}] ` : ''}${i.produto.nome} — ${i.qtd} kg — ${fmtMoeda(i.preco)}/kg = ${fmtMoeda(i.subtotal)}\n`;
       } else if (industria) {
         const upp = unidadesPorPallet(industria);
         const pallets = i.qtd / upp;
@@ -1841,9 +2008,12 @@ function PainelCliente({ cliente, produtos, industrias, onSair, onTrocarCliente,
                   {produtos.filter((p) => p.categoria === cat).map((p, idx) => {
                     const qtdUnidades = carrinho[p.id] || 0;
                     const industria = getIndustriaDoProduto(p, industrias);
-                    const vendidoPorPeso = ehVendidoPorPeso(industria);
+                    const vendidoPorPeso = produtoEhPorPeso(p, industria);
                     const upp = industria && !vendidoPorPeso ? unidadesPorPallet(industria) : null;
-                    const precoUnit = cliente.precos[p.id] ?? 0;
+                    // FIX: o preço mostrado ao vendedor SEMPRE vem da tabela geral (p.precoPadrao),
+                    // nunca de um preço fixo salvo por cliente. Antes usava "cliente.precos[p.id]",
+                    // que ficava desatualizado sempre que o admin mudava o preço na tabela geral.
+                    const precoUnit = p.precoPadrao ?? 0;
                     const qtdPallets = industria && !vendidoPorPeso ? qtdUnidades / upp : null;
                     return (
                       <div
@@ -1902,7 +2072,7 @@ function PainelCliente({ cliente, produtos, industrias, onSair, onTrocarCliente,
                               1 pallet = {industria.caixasPorPallet} cx ({upp} un) = {fmtMoeda(precoUnit * upp)}
                             </div>
                           )}
-                          {vendidoPorPeso && (
+                          {vendidoPorPeso && industria && (
                             <div style={{ fontSize: 11.5, color: '#0a4d8c', marginTop: 2, fontWeight: 600 }}>
                               Cx: {industria.pecasPorCaixa} peças (~{industria.kgPorPecaAprox}kg cada) · Pallet: {industria.caixasPorPallet} cx (~{industria.kgPorPalletAprox}kg) ≈ {fmtMoeda(precoUnit * industria.kgPorPalletAprox)}
                             </div>
@@ -2166,7 +2336,7 @@ function PainelCliente({ cliente, produtos, industrias, onSair, onTrocarCliente,
                 cursor: pedidoBloqueado ? 'not-allowed' : 'pointer',
               }}
             >
-              <Icon.WhatsApp width={17} height={17} /> {misturaIndustrias ? 'Misture só 1 indústria' : pedidoBloqueado ? 'Mínimo não atingido' : 'Revisar e enviar'}
+              <Icon.WhatsApp width={17} height={17} /> {misturaIndustrias ? 'Misture só 1 indústria' : 'Revisar e enviar'}
             </button>
           </div>
         </div>
@@ -2209,7 +2379,7 @@ function PainelCliente({ cliente, produtos, industrias, onSair, onTrocarCliente,
               {itensCarrinho.map((i) => {
                 const industria = getIndustriaDoProduto(i.produto, industrias);
                 let descricaoQtd;
-                if (ehVendidoPorPeso(industria)) {
+                if (produtoEhPorPeso(i.produto, industria)) {
                   descricaoQtd = `${i.qtd} kg`;
                 } else if (industria) {
                   descricaoQtd = `${i.qtd / unidadesPorPallet(industria)} pallet(s)`;
@@ -2356,14 +2526,13 @@ function TabButton({ ativo, onClick, label }) {
       style={{
         padding: '9px 18px',
         borderRadius: 9,
-        border: 'none',
+        border: ativo ? 'none' : '1px solid #e3ecf4',
         background: ativo ? '#0a4d8c' : '#fff',
         color: ativo ? '#fff' : '#3a5872',
         fontSize: 14,
         fontWeight: 600,
         cursor: 'pointer',
         fontFamily: 'inherit',
-        border: ativo ? 'none' : '1px solid #e3ecf4',
       }}
     >
       {label}
@@ -2415,8 +2584,16 @@ function PainelAdmin({ dados, setDados, onSair }) {
   const [clienteEditando, setClienteEditando] = useState(dados.clientes[0]?.id || null);
   const [novoClienteAberto, setNovoClienteAberto] = useState(false);
   const [novoVendedorAberto, setNovoVendedorAberto] = useState(false);
+  const [novoProdutoAberto, setNovoProdutoAberto] = useState(false);
+  const [novaIndustriaAberta, setNovaIndustriaAberta] = useState(false);
+  const [tabelaCopiada, setTabelaCopiada] = useState(false);
+  const [precosEditandoTexto, setPrecosEditandoTexto] = useState({});
   const [migrando, setMigrando] = useState(false);
   const [migracaoStatus, setMigracaoStatus] = useState(null);
+  const [precosNaoSalvos, setPrecosNaoSalvos] = useState(false);
+  const [salvandoPrecos, setSalvandoPrecos] = useState(false);
+  const [precosSalvosRecentemente, setPrecosSalvosRecentemente] = useState(false);
+  const [statusVendaPorIndustria, setStatusVendaPorIndustria] = useState({});
 
   // Envia todos os dados de exemplo (indústrias, produtos, vendedores, clientes
   // com seus preços) para o banco de dados de uma só vez. Usado apenas uma vez,
@@ -2433,6 +2610,9 @@ function PainelAdmin({ dados, setDados, onSair }) {
         unidades_por_caixa: i.unidadesPorCaixa || null,
         caixas_por_pallet: i.caixasPorPallet || null,
         pallets_minimo_pedido: i.pallettesMinimoPorPedido || null,
+        pecas_por_caixa: i.pecasPorCaixa || null,
+        kg_por_peca_aprox: i.kgPorPecaAprox || null,
+        kg_por_pallet_aprox: i.kgPorPalletAprox || null,
         peso_minimo_kg_pedido: i.pesoMinimoKgPorPedido || null,
         cor_selo_bg: i.corSelo?.bg || null,
         cor_selo_texto: i.corSelo?.texto || null,
@@ -2448,6 +2628,7 @@ function PainelAdmin({ dados, setDados, onSair }) {
         foto: p.foto || null,
         industria_id: p.industriaId || null,
         tampa: typeof p.tampa === 'boolean' ? p.tampa : null,
+        unidade_venda: p.unidadeVenda || null,
         preco_padrao: p.precoPadrao || null,
       })));
 
@@ -2477,37 +2658,149 @@ function PainelAdmin({ dados, setDados, onSair }) {
     { padrao: ['p17', 'p18', 'p19'], zeroLactose: 'p20' }, // Dália Alimentos
   ];
 
+  // Grava a tabela de produtos inteira no banco (nomes e preços atuais).
   async function salvarProdutosNoBanco(produtos) {
-  await supabaseUpsert('produtos', produtos.map((p) => ({
-    id: p.id,
-    nome: p.nome,
-    categoria: p.categoria,
-    validade_dias: p.validadeDias,
-    validade_obs: p.validadeObs,
-    foto: p.foto,
-    industria_id: p.industriaId,
-    tampa: p.tampa,
-    preco_padrao: p.precoPadrao,
-  })));
-}
+    await supabaseUpsert('produtos', produtos.map((p) => ({
+      id: p.id,
+      nome: p.nome,
+      categoria: p.categoria,
+      validade_dias: p.validadeDias ?? null,
+      validade_obs: p.validadeObs ?? null,
+      foto: p.foto ?? null,
+      industria_id: p.industriaId ?? null,
+      tampa: typeof p.tampa === 'boolean' ? p.tampa : null,
+      unidade_venda: p.unidadeVenda ?? null,
+      preco_padrao: p.precoPadrao ?? null,
+    })));
+  }
 
-function atualizarPreco(produtoId, valor) {
-  setDados((prev) => {
-    const novosProdutos = prev.produtos.map((p) => {
-      const grupo = GRUPOS_LEITE_PADRAO.find((g) => g.padrao.includes(produtoId) || g.zeroLactose === produtoId);
-      if (grupo) {
-        if (grupo.padrao.includes(p.id)) return { ...p, precoPadrao: valor };
-        if (p.id === grupo.zeroLactose) return { ...p, precoPadrao: Math.round((valor + DIFERENCA_ZERO_LACTOSE) * 100) / 100 };
+  // Agora so atualiza a tela (em memoria); so grava no banco quando clicar em "Salvar alteracoes".
+  function atualizarPreco(produtoId, valor) {
+    setDados((prev) => {
+      const novosProdutos = prev.produtos.map((p) => {
+        const grupo = GRUPOS_LEITE_PADRAO.find((g) => g.padrao.includes(produtoId) || g.zeroLactose === produtoId);
+        if (grupo) {
+          if (grupo.padrao.includes(p.id)) return { ...p, precoPadrao: valor };
+          if (p.id === grupo.zeroLactose) return { ...p, precoPadrao: Math.round((valor + DIFERENCA_ZERO_LACTOSE) * 100) / 100 };
+          return p;
+        }
+        if (p.id === produtoId) return { ...p, precoPadrao: valor };
         return p;
-      }
-      if (p.id === produtoId) return { ...p, precoPadrao: valor };
-      return p;
+      });
+      return { ...prev, produtos: novosProdutos };
     });
-    salvarProdutosNoBanco(novosProdutos).catch((e) => console.error('Erro ao salvar preço:', e));
-    return { ...prev, produtos: novosProdutos };
-  });
-}
-  
+    setPrecosNaoSalvos(true);
+    setPrecosSalvosRecentemente(false);
+  }
+
+  async function salvarAlteracoesDeTabela() {
+    setSalvandoPrecos(true);
+    try {
+      await salvarProdutosNoBanco(dados.produtos);
+      setPrecosNaoSalvos(false);
+      setPrecosSalvosRecentemente(true);
+      setTimeout(() => setPrecosSalvosRecentemente(false), 2500);
+    } catch (e) {
+      console.error('Erro ao salvar tabela de preços:', e);
+    }
+    setSalvandoPrecos(false);
+  }
+
+  // Monta os grupos (industria + produtos) a partir do estado atual — usado tanto
+  // pra gerar o texto do WhatsApp quanto pro PDF, sempre com os precos mais recentes
+  // (incluindo grupos com "venda suspensa", que aparecem com preco R$ 0,00).
+  // Verifica se um grupo (industria) esta com venda suspensa: manualmente marcado
+  // no seletor, OU todos os produtos dele com preco zerado (deteccao automatica).
+  function grupoEstaSuspenso(industria, produtos) {
+    if (!industria) return false;
+    if (statusVendaPorIndustria[industria.id] === 'suspensa') return true;
+    return produtos.every((p) => (p.precoPadrao ?? 0) === 0);
+  }
+
+  function montarGruposDaTabela() {
+    const produtosPorIndustria = {};
+    dados.produtos.forEach((p) => {
+      const chave = p.industriaId || 'sem-industria';
+      if (!produtosPorIndustria[chave]) produtosPorIndustria[chave] = [];
+      produtosPorIndustria[chave].push(p);
+    });
+    return [
+      ...dados.industrias.map((ind) => ({ industria: ind, produtos: produtosPorIndustria[ind.id] || [] })),
+      { industria: null, produtos: produtosPorIndustria['sem-industria'] || [] },
+    ]
+      .filter((g) => g.produtos.length > 0)
+      .sort((a, b) => {
+        const suspA = grupoEstaSuspenso(a.industria, a.produtos) ? 1 : 0;
+        const suspB = grupoEstaSuspenso(b.industria, b.produtos) ? 1 : 0;
+        if (suspA !== suspB) return suspA - suspB;
+        return categoriaGrupoRank(a.produtos) - categoriaGrupoRank(b.produtos);
+      });
+  }
+
+  function montarTextoTabelaAdmin() {
+    const grupos = montarGruposDaTabela();
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    let texto = `*TABELA DE PREÇOS — BRITTO LATICÍNIOS*\nAtualizada em ${hoje}\n`;
+    grupos.forEach(({ industria, produtos }) => {
+      const suspensa = grupoEstaSuspenso(industria, produtos);
+      texto += `\n*${industria ? industria.nome.toUpperCase() : 'OUTROS'}*${suspensa ? ' — *VENDA SUSPENSA*' : ''}\n`;
+      if (industria?.regraCarga) {
+        texto += `_${industria.regraCarga}_\n`;
+      }
+      produtos.forEach((p) => {
+        const unidade = produtoEhPorPeso(p, industria) ? '/kg' : '/un';
+        texto += `• ${p.nome}: ${fmtMoeda(p.precoPadrao ?? 0)} ${unidade}\n`;
+      });
+    });
+    texto += `\n\n*${NOTA_TABELA_PRECO}*`;
+    return texto;
+  }
+
+  function gerarEBaixarPDFAdmin() {
+    const grupos = montarGruposDaTabela();
+    const linhas = [];
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    linhas.push({ texto: 'TABELA DE PRECOS - BRITTO LATICINIOS', tamanho: 16, negrito: true });
+    linhas.push({ texto: `Atualizada em ${hoje}`, tamanho: 9, cor: '0.55 0.55 0.55' });
+    linhas.push({ texto: '', tamanho: 6 });
+
+    grupos.forEach(({ industria, produtos }) => {
+      const suspensa = grupoEstaSuspenso(industria, produtos);
+      linhas.push({
+        texto: industria ? industria.nome.toUpperCase() : 'OUTROS',
+        tamanho: 12,
+        negrito: true,
+        cor: '0.04 0.30 0.55',
+        precoTexto: suspensa ? 'VENDA SUSPENSA' : undefined,
+        corPreco: '0.7 0.15 0.12',
+      });
+      if (industria?.regraCarga) {
+        linhas.push({ texto: removerAcentos(industria.regraCarga), tamanho: 9, cor: '0.4 0.4 0.4' });
+      }
+      produtos.forEach((p) => {
+        const unidade = produtoEhPorPeso(p, industria) ? '/kg' : '/un';
+        const nomeLimpo = removerAcentos(p.nome);
+        const precoTxt = removerAcentos(`${fmtMoeda(p.precoPadrao ?? 0)} ${unidade}`);
+        linhas.push({ texto: `${nomeLimpo}`, precoTexto: precoTxt, tamanho: 10 });
+      });
+      linhas.push({ texto: '', tamanho: 6 });
+    });
+
+    linhas.push({ texto: '', tamanho: 4 });
+    linhas.push({ texto: removerAcentos('Preço sujeito à alteração conforme disponibilidade.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
+    linhas.push({ texto: removerAcentos('Favor sempre consultar o vendedor antes de passar o pedido.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
+
+    const pdfBytes = construirPDFSimples(linhas);
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `tabela-precos-britto-${new Date().toISOString().slice(0, 10)}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
 
   function marcarConfirmado(pedidoId) {
     setDados((prev) => ({
@@ -2554,6 +2847,60 @@ function atualizarPreco(produtoId, valor) {
     setClienteEditando(id);
     setNovoClienteAberto(false);
     salvarClienteNoBanco(clienteNovo).catch((e) => console.error('Erro ao salvar cliente:', e));
+  }
+
+  // Marca um grupo (industria) como venda ativa ou suspensa. Ao suspender, zera o
+  // preco de todos os produtos daquela industria (ex: os 4 tipos de leite longa vida
+  // da mesma marca). Ao reativar, so libera a edicao — o preco fica em R$ 0 ate o
+  // admin digitar o valor novo.
+  function alterarStatusVenda(industriaId, novoStatus) {
+    setStatusVendaPorIndustria((prev) => ({ ...prev, [industriaId]: novoStatus }));
+    if (novoStatus === 'suspensa') {
+      setDados((prev) => ({
+        ...prev,
+        produtos: prev.produtos.map((p) => (p.industriaId === industriaId ? { ...p, precoPadrao: 0 } : p)),
+      }));
+    }
+    setPrecosNaoSalvos(true);
+    setPrecosSalvosRecentemente(false);
+  }
+
+  // Atualiza o nome de um produto (fica pendente ate clicar em "Salvar alteracoes",
+  // igual ao preco).
+  function atualizarNomeProduto(produtoId, nome) {
+    setDados((prev) => ({
+      ...prev,
+      produtos: prev.produtos.map((p) => (p.id === produtoId ? { ...p, nome } : p)),
+    }));
+    setPrecosNaoSalvos(true);
+    setPrecosSalvosRecentemente(false);
+  }
+
+  // Remove um produto da tabela (acao imediata, igual remover cliente/vendedor).
+  function removerProduto(produtoId) {
+    setDados((prev) => ({ ...prev, produtos: prev.produtos.filter((p) => p.id !== produtoId) }));
+    removerProdutoDoBanco(produtoId).catch((e) => console.error('Erro ao remover produto:', e));
+  }
+
+  // Adiciona um produto novo na tabela (acao imediata).
+  function adicionarProduto(novo) {
+    const id = 'p' + Date.now();
+    const produtoNovo = { id, ...novo };
+    setDados((prev) => {
+      const novosProdutos = [...prev.produtos, produtoNovo];
+      salvarProdutosNoBanco(novosProdutos).catch((e) => console.error('Erro ao salvar produto:', e));
+      return { ...prev, produtos: novosProdutos };
+    });
+    setNovoProdutoAberto(false);
+  }
+
+  // Adiciona uma nova industria/fornecedor (acao imediata, igual remover/adicionar cliente).
+  function adicionarIndustria(novo) {
+    const id = 'ind' + Date.now();
+    const industriaNova = { id, ...novo };
+    setDados((prev) => ({ ...prev, industrias: [...prev.industrias, industriaNova] }));
+    salvarIndustriaNoBanco(industriaNova).catch((e) => console.error('Erro ao salvar indústria:', e));
+    setNovaIndustriaAberta(false);
   }
 
   const clienteAtual = dados.clientes.find((c) => c.id === clienteEditando);
@@ -2604,7 +2951,7 @@ function atualizarPreco(produtoId, valor) {
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
           <TabButton ativo={aba === 'pedidos'} onClick={() => setAba('pedidos')} label={`Pedidos${dados.pedidos.length ? ` (${dados.pedidos.length})` : ''}`} />
-          <TabButton ativo={aba === 'precos'} onClick={() => setAba('precos')} label="Preços por cliente" />
+          <TabButton ativo={aba === 'precos'} onClick={() => setAba('precos')} label="Alteração de tabela" />
           <TabButton ativo={aba === 'clientes'} onClick={() => setAba('clientes')} label="Clientes" />
           <TabButton ativo={aba === 'vendedores'} onClick={() => setAba('vendedores')} label="Vendedores" />
         </div>
@@ -2653,48 +3000,236 @@ function atualizarPreco(produtoId, valor) {
         )}
 
         {aba === 'precos' && (
-  <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e3ecf4', overflow: 'hidden' }}>
-    {dados.produtos.map((p, idx) => {
-      const ehZeroLactose = ['p8', 'p12', 'p16', 'p20'].includes(p.id);
-      const ehLeitePadrao = ['p1', 'p2', 'p3', 'p9', 'p10', 'p11', 'p13', 'p14', 'p15', 'p17', 'p18', 'p19'].includes(p.id);
-      return (
-        <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 18px', borderTop: idx === 0 ? 'none' : '1px solid #eef3f8' }}>
-          <FotoProduto produto={p} size={44} />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, color: '#1c3a52', fontWeight: 500 }}>{p.nome}</div>
-            <div style={{ fontSize: 12, color: '#90a6ba' }}>
-              {p.categoria}
-              {ehLeitePadrao && ' · preço sincronizado com Integral/Desnatado/Semidesnatado'}
-              {ehZeroLactose && ' · preço = Integral + R$ 0,50 (automático)'}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 14, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => setNovoProdutoAberto(true)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#eaf1f7', color: '#0a4d8c', border: 'none', borderRadius: 9, padding: '10px 16px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  <Icon.Plus width={15} height={15} /> Novo produto
+                </button>
+                <button
+                  onClick={gerarEBaixarPDFAdmin}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#eaf1f7', color: '#0a4d8c', border: 'none', borderRadius: 9, padding: '10px 16px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  <Icon.Download width={15} height={15} /> Gerar PDF
+                </button>
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(montarTextoTabelaAdmin())}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => { try { navigator.clipboard.writeText(montarTextoTabelaAdmin()); } catch (e) {} }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#e9f7ee', color: '#1c8a4b', border: 'none', borderRadius: 9, padding: '10px 16px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}
+                >
+                  <Icon.WhatsApp width={15} height={15} /> Enviar tabela
+                </a>
+                <button
+                  onClick={() => {
+                    try { navigator.clipboard.writeText(montarTextoTabelaAdmin()); } catch (e) {}
+                    setTabelaCopiada(true);
+                    setTimeout(() => setTabelaCopiada(false), 2000);
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#eaf1f7', color: '#0a4d8c', border: 'none', borderRadius: 9, padding: '10px 16px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  {tabelaCopiada ? '✓ Copiado!' : 'Copiar tabela'}
+                </button>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {precosSalvosRecentemente && (
+                <span style={{ fontSize: 13, color: '#1c8a4b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <Icon.Check width={14} height={14} /> Salvo!
+                </span>
+              )}
+              <button
+                onClick={salvarAlteracoesDeTabela}
+                disabled={!precosNaoSalvos || salvandoPrecos}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 7,
+                  background: precosNaoSalvos ? '#0a4d8c' : '#c2d1de',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 9,
+                  padding: '10px 16px',
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  cursor: precosNaoSalvos && !salvandoPrecos ? 'pointer' : 'not-allowed',
+                  fontFamily: 'inherit',
+                }}
+              >
+                <Icon.Check width={15} height={15} /> {salvandoPrecos ? 'Salvando...' : precosNaoSalvos ? 'Salvar alterações' : 'Tudo salvo'}
+              </button>
+              </div>
             </div>
+
+            {novaIndustriaAberta && (
+              <FormNovaIndustria
+                onSalvar={adicionarIndustria}
+                onCancelar={() => setNovaIndustriaAberta(false)}
+              />
+            )}
+
+            {novoProdutoAberto && !novaIndustriaAberta && (
+              <FormNovoProduto
+                industrias={dados.industrias}
+                onSalvar={adicionarProduto}
+                onCancelar={() => setNovoProdutoAberto(false)}
+                onAbrirNovaIndustria={() => setNovaIndustriaAberta(true)}
+              />
+            )}
+
+            {(() => {
+              const produtosPorIndustria = {};
+              dados.produtos.forEach((p) => {
+                const chave = p.industriaId || 'sem-industria';
+                if (!produtosPorIndustria[chave]) produtosPorIndustria[chave] = [];
+                produtosPorIndustria[chave].push(p);
+              });
+              const grupos = [
+                ...dados.industrias.map((ind) => ({ industria: ind, produtos: produtosPorIndustria[ind.id] || [] })),
+                { industria: null, produtos: produtosPorIndustria['sem-industria'] || [] },
+              ]
+                .filter((g) => g.produtos.length > 0)
+                .sort((a, b) => {
+                  const suspA = grupoEstaSuspenso(a.industria, a.produtos) ? 1 : 0;
+                  const suspB = grupoEstaSuspenso(b.industria, b.produtos) ? 1 : 0;
+                  if (suspA !== suspB) return suspA - suspB;
+                  return categoriaGrupoRank(a.produtos) - categoriaGrupoRank(b.produtos);
+                });
+
+              return grupos.map(({ industria, produtos }) => {
+                const statusGrupo = industria ? (statusVendaPorIndustria[industria.id] || 'ativa') : 'ativa';
+                const suspensa = statusGrupo === 'suspensa';
+                return (
+                  <div key={industria ? industria.id : 'outros'} style={{ marginBottom: 22 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
+                      <div
+                        style={{
+                          display: 'inline-block',
+                          fontSize: 12,
+                          fontWeight: 800,
+                          padding: '4px 12px',
+                          borderRadius: 6,
+                          background: industria?.corSelo?.bg || '#5b7691',
+                          color: industria?.corSelo?.texto || '#fff',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.04em',
+                        }}
+                      >
+                        {industria ? industria.nome : 'Outros'}
+                      </div>
+                      {industria && (
+                        <select
+                          value={statusGrupo}
+                          onChange={(e) => alterarStatusVenda(industria.id, e.target.value)}
+                          style={{
+                            fontSize: 12.5,
+                            fontWeight: 600,
+                            padding: '6px 10px',
+                            borderRadius: 8,
+                            border: '1.5px solid ' + (suspensa ? '#f3b7ae' : '#b7ddc4'),
+                            color: suspensa ? '#b3261e' : '#1c8a4b',
+                            background: suspensa ? '#fdecea' : '#e9f7ee',
+                            fontFamily: 'inherit',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <option value="ativa">Venda ativa</option>
+                          <option value="suspensa">Venda suspensa</option>
+                        </select>
+                      )}
+                    </div>
+                    <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e3ecf4', overflow: 'hidden' }}>
+                      {produtos.map((p, idx) => {
+                        const ehZeroLactose = ['p8', 'p12', 'p16', 'p20'].includes(p.id);
+                        const ehLeitePadrao = ['p1', 'p2', 'p3', 'p9', 'p10', 'p11', 'p13', 'p14', 'p15', 'p17', 'p18', 'p19'].includes(p.id);
+                        const desabilitado = ehZeroLactose || suspensa;
+                        return (
+                          <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 18px', borderTop: idx === 0 ? 'none' : '1px solid #eef3f8', gap: 10 }}>
+                            <FotoProduto produto={p} size={44} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <input
+                                type="text"
+                                value={p.nome}
+                                onChange={(e) => atualizarNomeProduto(p.id, e.target.value)}
+                                style={{
+                                  width: '100%',
+                                  fontSize: 14,
+                                  color: '#1c3a52',
+                                  fontWeight: 500,
+                                  border: '1.5px solid transparent',
+                                  borderRadius: 6,
+                                  padding: '3px 6px',
+                                  fontFamily: 'inherit',
+                                  marginLeft: -6,
+                                  background: 'transparent',
+                                }}
+                                onFocus={(e) => { e.target.style.border = '1.5px solid #d7e3ed'; e.target.style.background = '#fff'; }}
+                                onBlur={(e) => { e.target.style.border = '1.5px solid transparent'; e.target.style.background = 'transparent'; }}
+                              />
+                              <div style={{ fontSize: 12, color: '#90a6ba', marginTop: 2 }}>
+                                {p.categoria}
+                                {ehLeitePadrao && ' · preço sincronizado com Integral/Desnatado/Semidesnatado'}
+                                {ehZeroLactose && ' · preço = Integral + R$ 0,50 (automático)'}
+                                {suspensa && ' · venda suspensa'}
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                              <span style={{ fontSize: 14, color: '#5b7691' }}>R$</span>
+                              <input
+                                type="text"
+                                inputMode="decimal"
+                                value={precosEditandoTexto[p.id] !== undefined ? precosEditandoTexto[p.id] : String(p.precoPadrao ?? 0)}
+                                disabled={desabilitado}
+                                onFocus={(e) => {
+                                  setPrecosEditandoTexto((prev) => ({ ...prev, [p.id]: String(p.precoPadrao ?? 0) }));
+                                  e.target.select();
+                                }}
+                                onChange={(e) => {
+                                  const raw = e.target.value.replace(/[^0-9.,]/g, '');
+                                  setPrecosEditandoTexto((prev) => ({ ...prev, [p.id]: raw }));
+                                  const numero = parseFloat(raw.replace(',', '.'));
+                                  if (!isNaN(numero)) atualizarPreco(p.id, numero);
+                                }}
+                                onBlur={() => {
+                                  setPrecosEditandoTexto((prev) => {
+                                    const copia = { ...prev };
+                                    delete copia[p.id];
+                                    return copia;
+                                  });
+                                }}
+                                style={{
+                                  width: 90,
+                                  padding: '7px 10px',
+                                  borderRadius: 8,
+                                  border: '1.5px solid #d7e3ed',
+                                  fontSize: 14,
+                                  textAlign: 'right',
+                                  fontFamily: 'inherit',
+                                  background: desabilitado ? '#f5f8fb' : '#fff',
+                                  color: desabilitado ? '#90a6ba' : '#1c3a52',
+                                }}
+                              />
+                            </div>
+                            <button
+                              onClick={() => removerProduto(p.id)}
+                              title="Excluir produto"
+                              style={{ background: '#fdecea', border: 'none', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b3261e', cursor: 'pointer', flexShrink: 0 }}
+                            >
+                              <Icon.Trash width={14} height={14} />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              });
+            })()}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 14, color: '#5b7691' }}>R$</span>
-            <input
-              type="number"
-              step="0.01"
-              value={p.precoPadrao ?? 0}
-              disabled={ehZeroLactose}
-              onChange={(e) => atualizarPreco(p.id, parseFloat(e.target.value) || 0)}
-              style={{
-                width: 90,
-                padding: '7px 10px',
-                borderRadius: 8,
-                border: '1.5px solid #d7e3ed',
-                fontSize: 14,
-                textAlign: 'right',
-                fontFamily: 'inherit',
-                background: ehZeroLactose ? '#f5f8fb' : '#fff',
-                color: ehZeroLactose ? '#90a6ba' : '#1c3a52',
-              }}
-            />
-          </div>
-        </div>
-      );
-    })}
-  </div>
-)}
-           
+        )}
 
         {aba === 'clientes' && (
           <div>
@@ -2826,6 +3361,205 @@ function FormNovoCliente({ onSalvar, onCancelar }) {
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
         <button onClick={salvar} style={{ background: '#0a4d8c', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 18px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Salvar cliente</button>
+        <button onClick={onCancelar} style={{ background: '#f5f8fb', color: '#5b7691', border: '1px solid #e3ecf4', borderRadius: 9, padding: '10px 18px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Cancelar</button>
+      </div>
+    </div>
+  );
+}
+
+function FormNovoProduto({ industrias, onSalvar, onCancelar, onAbrirNovaIndustria }) {
+  const [form, setForm] = useState({
+    nome: '',
+    categoria: 'Leite UHT',
+    precoPadrao: '',
+    industriaId: '',
+    validadeDias: '',
+    unidadeVenda: 'un', // 'un' (por unidade) ou 'kg' (peso variável)
+  });
+
+  function salvar() {
+    if (!form.nome || !form.precoPadrao) return;
+    onSalvar({
+      nome: form.nome,
+      categoria: form.categoria || 'Outros',
+      precoPadrao: parseFloat(form.precoPadrao) || 0,
+      industriaId: form.industriaId || null,
+      validadeDias: form.validadeDias ? parseInt(form.validadeDias, 10) : null,
+      unidadeVenda: form.unidadeVenda,
+      foto: null,
+    });
+  }
+
+  return (
+    <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e3ecf4', padding: 20, marginBottom: 16 }}>
+      <div style={{ fontSize: 14.5, fontWeight: 700, color: '#0a3a66', marginBottom: 14 }}>Cadastrar novo produto</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+        <Campo label="Nome do produto" value={form.nome} onChange={(v) => setForm({ ...form, nome: v })} />
+        <Campo label="Categoria" value={form.categoria} onChange={(v) => setForm({ ...form, categoria: v })} />
+        <Campo label="Preço padrão (R$)" value={form.precoPadrao} onChange={(v) => setForm({ ...form, precoPadrao: v })} />
+        <Campo label="Validade (dias, opcional)" value={form.validadeDias} onChange={(v) => setForm({ ...form, validadeDias: v })} />
+        <div>
+          <label style={{ fontSize: 12.5, fontWeight: 600, color: '#5b7691', display: 'block', marginBottom: 5 }}>Vendido por</label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, unidadeVenda: 'un' })}
+              style={{
+                flex: 1, padding: '9px 0', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                border: '1.5px solid ' + (form.unidadeVenda === 'un' ? '#0a4d8c' : '#d7e3ed'),
+                background: form.unidadeVenda === 'un' ? '#eaf1f7' : '#fff',
+                color: form.unidadeVenda === 'un' ? '#0a4d8c' : '#5b7691',
+              }}
+            >
+              Unidade
+            </button>
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, unidadeVenda: 'kg' })}
+              style={{
+                flex: 1, padding: '9px 0', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                border: '1.5px solid ' + (form.unidadeVenda === 'kg' ? '#0a4d8c' : '#d7e3ed'),
+                background: form.unidadeVenda === 'kg' ? '#eaf1f7' : '#fff',
+                color: form.unidadeVenda === 'kg' ? '#0a4d8c' : '#5b7691',
+              }}
+            >
+              Peso (kg)
+            </button>
+          </div>
+        </div>
+        <div>
+          <label style={{ fontSize: 12.5, fontWeight: 600, color: '#5b7691', display: 'block', marginBottom: 5 }}>Indústria (opcional)</label>
+          <select
+            value={form.industriaId}
+            onChange={(e) => setForm({ ...form, industriaId: e.target.value })}
+            style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1.5px solid #d7e3ed', fontSize: 13.5, fontFamily: 'inherit', boxSizing: 'border-box' }}
+          >
+            <option value="">Nenhuma (ex: queijos avulsos)</option>
+            {industrias.map((i) => (
+              <option key={i.id} value={i.id}>{i.nome}</option>
+            ))}
+          </select>
+          {onAbrirNovaIndustria && (
+            <button
+              type="button"
+              onClick={onAbrirNovaIndustria}
+              style={{ marginTop: 6, background: 'none', border: 'none', color: '#0a4d8c', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', padding: 0, fontFamily: 'inherit' }}
+            >
+              + Cadastrar nova indústria/fornecedor
+            </button>
+          )}
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button onClick={salvar} style={{ background: '#0a4d8c', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 18px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Salvar produto</button>
+        <button onClick={onCancelar} style={{ background: '#f5f8fb', color: '#5b7691', border: '1px solid #e3ecf4', borderRadius: 9, padding: '10px 18px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Cancelar</button>
+      </div>
+    </div>
+  );
+}
+
+function FormNovaIndustria({ onSalvar, onCancelar }) {
+  const [form, setForm] = useState({
+    nome: '',
+    tipoVenda: 'pallet', // 'pallet' (leite longa vida, embalagem fechada) ou 'peso' (queijo, peso variável)
+    unidadesPorCaixa: '12',
+    caixasPorPallet: '85',
+    pallettesMinimoPorPedido: '12',
+    pecasPorCaixa: '6',
+    kgPorPecaAprox: '4',
+    kgPorPalletAprox: '1000',
+    pesoMinimoKgPorPedido: '500',
+    corBg: '#0a4d8c',
+    corTexto: '#ffe066',
+    regraCarga: '',
+  });
+
+  function salvar() {
+    if (!form.nome) return;
+    const ehPeso = form.tipoVenda === 'peso';
+    const regraPadrao = ehPeso
+      ? `Mínimo de ${form.pesoMinimoKgPorPedido || 0} kg por CNPJ`
+      : `Carreta: pedido mínimo de ${form.pallettesMinimoPorPedido || 0} pallets`;
+    onSalvar({
+      nome: form.nome,
+      tipoVenda: ehPeso ? 'peso' : undefined,
+      unidadesPorCaixa: !ehPeso ? parseInt(form.unidadesPorCaixa, 10) || null : null,
+      caixasPorPallet: parseInt(form.caixasPorPallet, 10) || null,
+      pallettesMinimoPorPedido: !ehPeso ? parseInt(form.pallettesMinimoPorPedido, 10) || null : null,
+      pecasPorCaixa: ehPeso ? parseInt(form.pecasPorCaixa, 10) || null : null,
+      kgPorPecaAprox: ehPeso ? parseFloat(form.kgPorPecaAprox) || null : null,
+      kgPorPalletAprox: ehPeso ? parseFloat(form.kgPorPalletAprox) || null : null,
+      pesoMinimoKgPorPedido: ehPeso ? parseFloat(form.pesoMinimoKgPorPedido) || null : null,
+      corSelo: { bg: form.corBg, texto: form.corTexto },
+      regraCarga: form.regraCarga.trim() || regraPadrao,
+    });
+  }
+
+  return (
+    <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e3ecf4', padding: 20, marginBottom: 16 }}>
+      <div style={{ fontSize: 14.5, fontWeight: 700, color: '#0a3a66', marginBottom: 14 }}>Cadastrar nova indústria/fornecedor</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+        <Campo label="Nome da indústria" value={form.nome} onChange={(v) => setForm({ ...form, nome: v })} />
+        <div>
+          <label style={{ fontSize: 12.5, fontWeight: 600, color: '#5b7691', display: 'block', marginBottom: 5 }}>Forma de venda</label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, tipoVenda: 'pallet' })}
+              style={{
+                flex: 1, padding: '9px 0', borderRadius: 8, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                border: '1.5px solid ' + (form.tipoVenda === 'pallet' ? '#0a4d8c' : '#d7e3ed'),
+                background: form.tipoVenda === 'pallet' ? '#eaf1f7' : '#fff',
+                color: form.tipoVenda === 'pallet' ? '#0a4d8c' : '#5b7691',
+              }}
+            >
+              Pallet fechado
+            </button>
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, tipoVenda: 'peso' })}
+              style={{
+                flex: 1, padding: '9px 0', borderRadius: 8, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                border: '1.5px solid ' + (form.tipoVenda === 'peso' ? '#0a4d8c' : '#d7e3ed'),
+                background: form.tipoVenda === 'peso' ? '#eaf1f7' : '#fff',
+                color: form.tipoVenda === 'peso' ? '#0a4d8c' : '#5b7691',
+              }}
+            >
+              Peso variável (kg)
+            </button>
+          </div>
+        </div>
+
+        {form.tipoVenda === 'pallet' ? (
+          <>
+            <Campo label="Unidades por caixa" value={form.unidadesPorCaixa} onChange={(v) => setForm({ ...form, unidadesPorCaixa: v })} />
+            <Campo label="Caixas por pallet" value={form.caixasPorPallet} onChange={(v) => setForm({ ...form, caixasPorPallet: v })} />
+            <Campo label="Pallets mínimo por pedido" value={form.pallettesMinimoPorPedido} onChange={(v) => setForm({ ...form, pallettesMinimoPorPedido: v })} />
+          </>
+        ) : (
+          <>
+            <Campo label="Peças por caixa" value={form.pecasPorCaixa} onChange={(v) => setForm({ ...form, pecasPorCaixa: v })} />
+            <Campo label="Kg aprox. por peça" value={form.kgPorPecaAprox} onChange={(v) => setForm({ ...form, kgPorPecaAprox: v })} />
+            <Campo label="Caixas por pallet (aprox.)" value={form.caixasPorPallet} onChange={(v) => setForm({ ...form, caixasPorPallet: v })} />
+            <Campo label="Kg aprox. por pallet" value={form.kgPorPalletAprox} onChange={(v) => setForm({ ...form, kgPorPalletAprox: v })} />
+            <Campo label="Peso mínimo por pedido (kg)" value={form.pesoMinimoKgPorPedido} onChange={(v) => setForm({ ...form, pesoMinimoKgPorPedido: v })} />
+          </>
+        )}
+
+        <div>
+          <label style={{ fontSize: 12.5, fontWeight: 600, color: '#5b7691', display: 'block', marginBottom: 5 }}>Cor da faixa (fundo)</label>
+          <input type="color" value={form.corBg} onChange={(e) => setForm({ ...form, corBg: e.target.value })} style={{ width: '100%', height: 38, borderRadius: 8, border: '1.5px solid #d7e3ed', padding: 2, boxSizing: 'border-box' }} />
+        </div>
+        <div>
+          <label style={{ fontSize: 12.5, fontWeight: 600, color: '#5b7691', display: 'block', marginBottom: 5 }}>Cor do texto da faixa</label>
+          <input type="color" value={form.corTexto} onChange={(e) => setForm({ ...form, corTexto: e.target.value })} style={{ width: '100%', height: 38, borderRadius: 8, border: '1.5px solid #d7e3ed', padding: 2, boxSizing: 'border-box' }} />
+        </div>
+        <div style={{ gridColumn: '1 / -1' }}>
+          <Campo label="Regra de carga (opcional — se vazio, gera uma automática)" value={form.regraCarga} onChange={(v) => setForm({ ...form, regraCarga: v })} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button onClick={salvar} style={{ background: '#0a4d8c', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 18px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Salvar indústria</button>
         <button onClick={onCancelar} style={{ background: '#f5f8fb', color: '#5b7691', border: '1px solid #e3ecf4', borderRadius: 9, padding: '10px 18px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Cancelar</button>
       </div>
     </div>
