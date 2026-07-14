@@ -664,7 +664,8 @@ const CLIENTES_INICIAIS = [
   { id: 'c49', usuario: 'pavaniajuda', senha: '1234', nomeFantasia: 'Pavani do bairro Ajuda', cnpj: '08.472.686/0002-06', prazoPagamento: '28 dias', vendedorId: 'v5', precos: { p1: 4.20, p2: 4.20, p3: 4.20, p8: 4.70, p9: 4.10, p10: 4.10, p11: 4.10, p12: 4.60, p13: 4.15, p14: 4.15, p15: 4.15, p16: 4.65, p17: 4.25, p18: 4.25, p19: 4.25, p20: 4.75, p21: 26.50, p4: 28.50, p5: 27.00, p6: 19.90, p7: 9.50 } },
 ];
 
-const ADMIN_LOGIN = { usuario: 'britto', senha: 'britto2026' };
+// O login do administrador agora é conferido dentro do banco (tabela admins,
+// com senha criptografada) — nenhuma senha fica escrita aqui no código.
 const WHATSAPP_VENDAS = '5522998145979';
 const WHATSAPP_FINANCEIRO = '5522999748356';
 const NOTA_TABELA_PRECO = 'Preço sujeito à alteração conforme disponibilidade. Favor sempre consultar o vendedor antes de passar o pedido.';
@@ -673,11 +674,56 @@ const NOTA_TABELA_PRECO = 'Preço sujeito à alteração conforme disponibilidad
 const SUPABASE_URL = 'https://cqwnilcejpqqkekeuozn.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_SXinizCUezL5VyDEfZZ95w_GJ6W0Tu7';
 
-const supabaseHeaders = {
-  'apikey': SUPABASE_KEY,
-  'Authorization': `Bearer ${SUPABASE_KEY}`,
-  'Content-Type': 'application/json',
-};
+// Crachá (token) da sessão logada. É enviado em toda chamada ao banco no
+// cabeçalho x-portal-token — sem ele, o banco não deixa ler nem gravar nada
+// (regras de RLS criadas pelo script seguranca-v1.sql).
+let portalToken = null;
+function setPortalToken(token) {
+  portalToken = token;
+}
+
+function supabaseHeaders() {
+  const h = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+  };
+  if (portalToken) h['x-portal-token'] = portalToken;
+  return h;
+}
+
+// Faz o login DENTRO do banco (a senha é conferida lá, criptografada) e
+// recebe de volta o crachá da sessão. Retorna null se usuário/senha errados.
+async function loginNoBanco(usuario, senha) {
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/portal_login`, {
+    method: 'POST',
+    headers: supabaseHeaders(),
+    body: JSON.stringify({ p_usuario: usuario, p_senha: senha }),
+  });
+  if (!resp.ok) throw new Error(`Erro ao entrar: ${resp.status}`);
+  return resp.json();
+}
+
+// Pergunta ao banco se o crachá atual ainda vale. Retorna 'admin', 'vendedor'
+// ou null (sessão vencida/inválida).
+async function validarSessaoNoBanco() {
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/portal_tipo`, {
+    method: 'POST',
+    headers: supabaseHeaders(),
+    body: '{}',
+  });
+  if (!resp.ok) throw new Error(`Erro ao validar sessão: ${resp.status}`);
+  return resp.json();
+}
+
+// Encerra a sessão no banco (o crachá deixa de valer na hora).
+async function logoutNoBanco() {
+  await fetch(`${SUPABASE_URL}/rest/v1/rpc/portal_logout`, {
+    method: 'POST',
+    headers: supabaseHeaders(),
+    body: '{}',
+  });
+}
 
 // Busca todos os registros de uma tabela do Supabase.
 async function supabaseGet(tabela, query = '') {
@@ -685,7 +731,7 @@ async function supabaseGet(tabela, query = '') {
   const timeoutId = setTimeout(() => controller.abort(), 10000);
   try {
     const resp = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}?select=*${query}`, {
-      headers: supabaseHeaders,
+      headers: supabaseHeaders(),
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
@@ -705,7 +751,7 @@ async function supabaseGet(tabela, query = '') {
 async function supabaseUpsert(tabela, registros) {
   const resp = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}`, {
     method: 'POST',
-    headers: { ...supabaseHeaders, Prefer: 'resolution=merge-duplicates,return=representation' },
+    headers: { ...supabaseHeaders(), Prefer: 'resolution=merge-duplicates,return=representation' },
     body: JSON.stringify(registros),
   });
   if (!resp.ok) {
@@ -719,7 +765,7 @@ async function supabaseUpsert(tabela, registros) {
 async function supabaseDelete(tabela, id) {
   const resp = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}?id=eq.${encodeURIComponent(id)}`, {
     method: 'DELETE',
-    headers: supabaseHeaders,
+    headers: supabaseHeaders(),
   });
   if (!resp.ok) throw new Error(`Erro ao remover de ${tabela}: ${resp.status}`);
 }
@@ -887,7 +933,7 @@ async function salvarPedidoNoBanco(pedido) {
 async function atualizarStatusPedidoNoBanco(pedidoId, status) {
   const resp = await fetch(`${SUPABASE_URL}/rest/v1/pedidos?id=eq.${encodeURIComponent(pedidoId)}`, {
     method: 'PATCH',
-    headers: supabaseHeaders,
+    headers: supabaseHeaders(),
     body: JSON.stringify({ status }),
   });
   if (!resp.ok) throw new Error(`Erro ao atualizar status do pedido: ${resp.status}`);
@@ -1237,39 +1283,70 @@ function limparLoginSalvo() {
   } catch (e) {}
 }
 
-function TelaLogin({ onLogin, vendedores }) {
+// Sessão ativa (o crachá + quem é o usuário). Fica salva no aparelho para o
+// vendedor não precisar entrar de novo a cada abertura do app.
+const SESSAO_KEY = 'britto-laticinios-sessao';
+
+function carregarSessaoSalva() {
+  try {
+    const raw = localStorage.getItem(SESSAO_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return null;
+}
+
+function salvarSessao(sessao) {
+  try {
+    localStorage.setItem(SESSAO_KEY, JSON.stringify(sessao));
+  } catch (e) {}
+}
+
+function limparSessao() {
+  try {
+    localStorage.removeItem(SESSAO_KEY);
+  } catch (e) {}
+}
+
+function TelaLogin({ onLogin }) {
   const loginSalvo = carregarLoginSalvo();
   const [usuario, setUsuario] = useState(loginSalvo?.usuario || '');
   const [senha, setSenha] = useState(loginSalvo?.senha || '');
   const [erro, setErro] = useState('');
+  const [entrando, setEntrando] = useState(false);
   const [modoAdmin, setModoAdmin] = useState(loginSalvo?.modoAdmin || false);
   const [lembrar, setLembrar] = useState(!!loginSalvo);
 
-  function tentarLogin(e) {
+  // A conferência de usuário e senha acontece DENTRO do banco (função
+  // portal_login) — nenhuma senha fica no código do site nem trafega em lista.
+  async function tentarLogin(e) {
     e.preventDefault();
+    if (entrando) return;
     setErro('');
-
-    if (modoAdmin) {
-      if (usuario === ADMIN_LOGIN.usuario && senha === ADMIN_LOGIN.senha) {
-        if (lembrar) salvarLogin(usuario, senha, true);
+    setEntrando(true);
+    try {
+      const resultado = await loginNoBanco(usuario, senha);
+      if (resultado && resultado.token) {
+        if (lembrar) salvarLogin(usuario, senha, resultado.tipo === 'admin');
         else limparLoginSalvo();
-        onLogin({ tipo: 'admin' });
+        const sessao = {
+          tipo: resultado.tipo,
+          token: resultado.token,
+          vendedorId: resultado.vendedor_id || null,
+          vendedorNome: resultado.vendedor_nome || null,
+        };
+        salvarSessao(sessao);
+        onLogin(sessao);
         return;
       }
-      setErro('Usuário ou senha de administrador incorretos.');
-      return;
+      setErro(
+        modoAdmin
+          ? 'Usuário ou senha de administrador incorretos.'
+          : 'Usuário ou senha incorretos. Confira com a Britto Laticínios.'
+      );
+    } catch (err) {
+      setErro('Não foi possível conectar. Verifique sua internet e tente de novo.');
     }
-
-    const vendedor = vendedores.find(
-      (v) => v.usuario.toLowerCase() === usuario.trim().toLowerCase() && v.senha === senha
-    );
-    if (vendedor) {
-      if (lembrar) salvarLogin(usuario, senha, false);
-      else limparLoginSalvo();
-      onLogin({ tipo: 'vendedor', vendedorId: vendedor.id });
-      return;
-    }
-    setErro('Usuário ou senha incorretos. Confira com a Britto Laticínios.');
+    setEntrando(false);
   }
 
   return (
@@ -1306,7 +1383,7 @@ function TelaLogin({ onLogin, vendedores }) {
           <input
             value={usuario}
             onChange={(e) => setUsuario(e.target.value)}
-            placeholder={modoAdmin ? 'britto' : 'seu usuário'}
+            placeholder={modoAdmin ? 'usuário administrador' : 'seu usuário'}
             style={inputStyle}
             autoFocus
           />
@@ -1349,8 +1426,8 @@ function TelaLogin({ onLogin, vendedores }) {
             </div>
           )}
 
-          <button type="submit" style={btnPrimary}>
-            Entrar
+          <button type="submit" disabled={entrando} style={{ ...btnPrimary, background: entrando ? '#c2d1de' : '#0a4d8c', cursor: entrando ? 'wait' : 'pointer' }}>
+            {entrando ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
 
@@ -3587,20 +3664,46 @@ function Campo({ label, value, onChange }) {
 
 // ---------- APP RAIZ ----------
 export default function App() {
+  // Sessão: { tipo: 'admin'|'vendedor', token, vendedorId?, vendedorNome? }.
+  // Se houver uma sessão salva no aparelho, o app já abre logado.
+  const [sessao, setSessao] = useState(() => carregarSessaoSalva());
   const [dados, setDados] = useState(null);
-  const [carregando, setCarregando] = useState(true);
+  const [carregando, setCarregando] = useState(() => !!carregarSessaoSalva());
   const [erroConexao, setErroConexao] = useState(null);
-  const [sessao, setSessao] = useState(null); // { tipo: 'vendedor'|'admin', vendedorId? }
 
-  // Carrega os dados do banco assim que o app abre.
+  function sair() {
+    logoutNoBanco().catch(() => {});
+    setPortalToken(null);
+    limparSessao();
+    setDados(null);
+    setSessao(null);
+  }
+
+  // Assim que há uma sessão (salva ou recém-logada): valida o crachá no banco
+  // e carrega os dados. Sem sessão válida, o banco não devolve nada (RLS).
   useEffect(() => {
+    if (!sessao) return;
     let cancelado = false;
-    loadData()
-      .then((d) => {
-        if (!cancelado) {
-          setDados(d);
+    setCarregando(true);
+    setErroConexao(null);
+    setPortalToken(sessao.token);
+    validarSessaoNoBanco()
+      .then((tipo) => {
+        if (cancelado) return null;
+        if (!tipo) {
+          // Crachá vencido ou inválido: volta para a tela de login.
+          setPortalToken(null);
+          limparSessao();
+          setSessao(null);
           setCarregando(false);
+          return null;
         }
+        return loadData().then((d) => {
+          if (!cancelado) {
+            setDados(d);
+            setCarregando(false);
+          }
+        });
       })
       .catch((err) => {
         if (!cancelado) {
@@ -3609,7 +3712,7 @@ export default function App() {
         }
       });
     return () => { cancelado = true; };
-  }, []);
+  }, [sessao]);
 
   async function registrarPedido(pedido) {
     // Atualiza a tela imediatamente (resposta rápida pro usuário)...
@@ -3653,23 +3756,29 @@ export default function App() {
   }
 
   if (!sessao) {
-    return <TelaLogin onLogin={setSessao} vendedores={dados.vendedores} />;
+    return <TelaLogin onLogin={setSessao} />;
+  }
+
+  if (!dados) {
+    // Intervalo curto entre validar a sessão e os dados chegarem — evita tela quebrada.
+    return null;
   }
 
   if (sessao.tipo === 'admin') {
-    return <PainelAdmin dados={dados} setDados={setDados} onSair={() => setSessao(null)} />;
+    return <PainelAdmin dados={dados} setDados={setDados} onSair={sair} />;
   }
 
-  const vendedor = dados.vendedores.find((v) => v.id === sessao.vendedorId);
-  if (!vendedor) {
-    return <TelaLogin onLogin={setSessao} vendedores={dados.vendedores} />;
-  }
+  // O cadastro do próprio vendedor vem do banco; se ainda não veio, usa o que
+  // está guardado na sessão (id e nome) para não travar a tela.
+  const vendedor =
+    dados.vendedores.find((v) => v.id === sessao.vendedorId) ||
+    { id: sessao.vendedorId, usuario: '', nome: sessao.vendedorNome || 'Vendedor' };
 
   return (
     <PainelVendedor
       vendedor={vendedor}
       dados={dados}
-      onSair={() => setSessao(null)}
+      onSair={sair}
       onNovoPedido={registrarPedido}
     />
   );
