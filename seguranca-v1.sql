@@ -33,7 +33,9 @@ update clientes set senha = null;
 -- Quando o admin cadastrar/alterar um vendedor ou cliente pelo app, a senha
 -- chega em texto e é criptografada na hora, nunca ficando salva legível.
 create or replace function trg_hash_senha() returns trigger
-language plpgsql as $$
+language plpgsql
+set search_path = public, extensions
+as $$
 begin
   if new.senha is not null and new.senha <> '' then
     new.senha_hash := crypt(new.senha, gen_salt('bf'));
@@ -77,7 +79,7 @@ create or replace function portal_login(p_usuario text, p_senha text)
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   v record;
@@ -123,6 +125,8 @@ $$ delete from sessoes where token::text = portal_token() $$;
 grant execute on function portal_login(text, text) to anon, authenticated;
 grant execute on function portal_tipo() to anon, authenticated;
 grant execute on function portal_logout() to anon, authenticated;
+
+notify pgrst, 'reload schema';
 
 -- ---------- 4) RLS: as regras de quem pode ver e mexer no quê ----------
 alter table industrias enable row level security;
