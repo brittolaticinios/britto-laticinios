@@ -1421,6 +1421,17 @@ function escaparTextoPDF(texto) {
   return texto.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
 }
 
+// Converte uma cor hex (#rrggbb) para o formato de cor do PDF ("r g b" com
+// valores de 0 a 1). Usado pra pintar o nome de cada indústria no PDF com a
+// mesma cor do selo dela no app. Se a cor for inválida/ausente, usa o azul padrão.
+function hexParaCorPDF(hex, fallback = '0.04 0.30 0.55') {
+  if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return fallback;
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  return `${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)}`;
+}
+
 // Monta um arquivo PDF válido do zero, escrevendo a estrutura binária mínima
 // necessária (cabeçalho, objetos, fonte Helvetica padrão, páginas com texto).
 // Não depende de nenhuma biblioteca externa nem da caixa de diálogo de
@@ -1589,7 +1600,7 @@ function TabelaPrecosGeral({ dados, onFechar }) {
     linhas.push({ texto: '', tamanho: 6 });
 
     gruposOrdenados.forEach(({ industria, produtos }) => {
-      linhas.push({ texto: industria ? industria.nome.toUpperCase() : 'OUTROS', tamanho: 12, negrito: true, cor: '0.04 0.30 0.55' });
+      linhas.push({ texto: industria ? industria.nome.toUpperCase() : 'OUTROS', tamanho: 12, negrito: true, cor: hexParaCorPDF(industria?.corSelo?.bg) });
       if (industria?.regraCarga) {
         linhas.push({ texto: removerAcentos(industria.regraCarga), tamanho: 9, cor: '0.4 0.4 0.4' });
       }
@@ -1603,6 +1614,8 @@ function TabelaPrecosGeral({ dados, onFechar }) {
     });
 
     linhas.push({ texto: '', tamanho: 4 });
+    linhas.push({ texto: 'Nota Rio: 22% de ICMS', tamanho: 11, negrito: true });
+    linhas.push({ texto: '', tamanho: 3 });
     linhas.push({ texto: removerAcentos('Preço sujeito à alteração conforme disponibilidade.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
     linhas.push({ texto: removerAcentos('Favor sempre consultar o vendedor antes de passar o pedido.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
 
@@ -2770,7 +2783,7 @@ function PainelAdmin({ dados, setDados, onSair }) {
         texto: industria ? industria.nome.toUpperCase() : 'OUTROS',
         tamanho: 12,
         negrito: true,
-        cor: '0.04 0.30 0.55',
+        cor: hexParaCorPDF(industria?.corSelo?.bg),
         precoTexto: suspensa ? 'VENDA SUSPENSA' : undefined,
         corPreco: '0.7 0.15 0.12',
       });
@@ -2787,6 +2800,8 @@ function PainelAdmin({ dados, setDados, onSair }) {
     });
 
     linhas.push({ texto: '', tamanho: 4 });
+    linhas.push({ texto: 'Nota Rio: 22% de ICMS', tamanho: 11, negrito: true });
+    linhas.push({ texto: '', tamanho: 3 });
     linhas.push({ texto: removerAcentos('Preço sujeito à alteração conforme disponibilidade.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
     linhas.push({ texto: removerAcentos('Favor sempre consultar o vendedor antes de passar o pedido.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
 
