@@ -1363,11 +1363,6 @@ function TelaLogin({ onLogin, vendedores }) {
           </button>
         </div>
 
-        {!modoAdmin && (
-          <div style={{ marginTop: 18, fontSize: 12, color: '#90a6ba', textAlign: 'center', lineHeight: 1.5 }}>
-            Teste: usuário <b>joao</b> · senha <b>1234</b>
-          </div>
-        )}
       </div>
     </div>
   );
