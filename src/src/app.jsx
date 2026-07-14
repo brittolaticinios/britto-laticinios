@@ -1597,6 +1597,8 @@ function TabelaPrecosGeral({ dados, onFechar }) {
     const hoje = new Date().toLocaleDateString('pt-BR');
     linhas.push({ texto: 'TABELA DE PRECOS - BRITTO LATICINIOS', tamanho: 16, negrito: true });
     linhas.push({ texto: `Atualizada em ${hoje}`, tamanho: 9, cor: '0.55 0.55 0.55' });
+    linhas.push({ texto: '', tamanho: 3 });
+    linhas.push({ texto: 'Nota Rio: 22% de ICMS', tamanho: 11, negrito: true });
     linhas.push({ texto: '', tamanho: 6 });
 
     gruposOrdenados.forEach(({ industria, produtos }) => {
@@ -1614,8 +1616,6 @@ function TabelaPrecosGeral({ dados, onFechar }) {
     });
 
     linhas.push({ texto: '', tamanho: 4 });
-    linhas.push({ texto: 'Nota Rio: 22% de ICMS', tamanho: 11, negrito: true });
-    linhas.push({ texto: '', tamanho: 3 });
     linhas.push({ texto: removerAcentos('Preço sujeito à alteração conforme disponibilidade.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
     linhas.push({ texto: removerAcentos('Favor sempre consultar o vendedor antes de passar o pedido.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
 
@@ -2775,6 +2775,8 @@ function PainelAdmin({ dados, setDados, onSair }) {
     const hoje = new Date().toLocaleDateString('pt-BR');
     linhas.push({ texto: 'TABELA DE PRECOS - BRITTO LATICINIOS', tamanho: 16, negrito: true });
     linhas.push({ texto: `Atualizada em ${hoje}`, tamanho: 9, cor: '0.55 0.55 0.55' });
+    linhas.push({ texto: '', tamanho: 3 });
+    linhas.push({ texto: 'Nota Rio: 22% de ICMS', tamanho: 11, negrito: true });
     linhas.push({ texto: '', tamanho: 6 });
 
     grupos.forEach(({ industria, produtos }) => {
@@ -2800,8 +2802,6 @@ function PainelAdmin({ dados, setDados, onSair }) {
     });
 
     linhas.push({ texto: '', tamanho: 4 });
-    linhas.push({ texto: 'Nota Rio: 22% de ICMS', tamanho: 11, negrito: true });
-    linhas.push({ texto: '', tamanho: 3 });
     linhas.push({ texto: removerAcentos('Preço sujeito à alteração conforme disponibilidade.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
     linhas.push({ texto: removerAcentos('Favor sempre consultar o vendedor antes de passar o pedido.'), tamanho: 9, negrito: true, cor: '0.57 0.25 0.05' });
 
