@@ -19,11 +19,13 @@ create extension if not exists pgcrypto;
 
 -- ---------- 1) Senhas criptografadas ----------
 alter table vendedores add column if not exists senha_hash text;
+alter table vendedores alter column senha drop not null;
 update vendedores set senha_hash = crypt(senha, gen_salt('bf'))
   where senha is not null and senha <> '' and senha_hash is null;
 update vendedores set senha = null;  -- apaga as senhas legíveis
 
 alter table clientes add column if not exists senha_hash text;
+alter table clientes alter column senha drop not null;
 update clientes set senha_hash = crypt(senha, gen_salt('bf'))
   where senha is not null and senha <> '' and senha_hash is null;
 update clientes set senha = null;
