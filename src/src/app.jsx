@@ -979,6 +979,16 @@ function produtoEhPorPeso(produto, industria) {
   return ehVendidoPorPeso(industria) || (produto && produto.unidadeVenda === 'kg');
 }
 
+// Uma indústria conta como "venda suspensa" quando TODOS os produtos dela estão
+// com preço zerado (é assim que o admin suspende um grupo na alteração de tabela).
+// Indústrias suspensas saem da tabela de preços, do PDF, do texto de WhatsApp e
+// do catálogo de pedidos — só continuam visíveis na tela de edição do admin.
+function industriaEstaSuspensa(industria, produtos) {
+  if (!industria) return false;
+  const doGrupo = produtos.filter((p) => p.industriaId === industria.id);
+  return doGrupo.length > 0 && doGrupo.every((p) => (p.precoPadrao ?? 0) === 0);
+}
+
 // Define a ordem de exibicao por categoria de produto: leite longa vida primeiro,
 // depois creme de leite, depois leite condensado, e por ultimo queijos/mussarela.
 // Usado para que a tabela de precos siga sempre essa mesma sequencia, tanto nos
@@ -1636,19 +1646,14 @@ function TabelaPrecosGeral({ dados, onFechar }) {
     produtosPorIndustria[chave].push(p);
   });
 
-  // Grupos com venda suspensa (todos os itens zerados) vao pro final da lista,
-  // deixando os grupos com venda ativa sempre visiveis primeiro.
+  // Indústrias com venda suspensa (todos os itens zerados) ficam FORA da tabela.
   const gruposOrdenados = [
     ...dados.industrias.map((ind) => ({ industria: ind, produtos: produtosPorIndustria[ind.id] || [] })),
     { industria: null, produtos: produtosPorIndustria['sem-industria'] || [] },
   ]
     .filter((g) => g.produtos.length > 0)
-    .sort((a, b) => {
-      const suspA = a.industria && a.produtos.every((p) => (p.precoPadrao ?? 0) === 0) ? 1 : 0;
-      const suspB = b.industria && b.produtos.every((p) => (p.precoPadrao ?? 0) === 0) ? 1 : 0;
-      if (suspA !== suspB) return suspA - suspB;
-      return categoriaGrupoRank(a.produtos) - categoriaGrupoRank(b.produtos);
-    });
+    .filter((g) => !industriaEstaSuspensa(g.industria, dados.produtos))
+    .sort((a, b) => categoriaGrupoRank(a.produtos) - categoriaGrupoRank(b.produtos));
 
   function montarTextoTabela() {
     const hoje = new Date().toLocaleDateString('pt-BR');
@@ -2097,7 +2102,9 @@ function PainelCliente({ cliente, produtos, industrias, onSair, onTrocarCliente,
     setAba('pedidos');
   }
 
-  const categorias = [...new Set(produtos.map((p) => p.categoria))];
+  // Produtos de indústrias com venda suspensa ficam fora do catálogo de pedidos.
+  const produtosDisponiveis = produtos.filter((p) => !industriaEstaSuspensa(getIndustriaDoProduto(p, industrias), produtos));
+  const categorias = [...new Set(produtosDisponiveis.map((p) => p.categoria))];
 
   return (
     <div style={{ minHeight: '100vh', background: '#f5f8fb', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -2122,7 +2129,7 @@ function PainelCliente({ cliente, produtos, industrias, onSair, onTrocarCliente,
                   {cat}
                 </h3>
                 <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e3ecf4', overflow: 'hidden' }}>
-                  {produtos.filter((p) => p.categoria === cat).map((p, idx) => {
+                  {produtosDisponiveis.filter((p) => p.categoria === cat).map((p, idx) => {
                     const qtdUnidades = carrinho[p.id] || 0;
                     const industria = getIndustriaDoProduto(p, industrias);
                     const vendidoPorPeso = produtoEhPorPeso(p, industria);
@@ -2834,6 +2841,8 @@ function PainelAdmin({ dados, setDados, onSair }) {
     return produtos.every((p) => (p.precoPadrao ?? 0) === 0);
   }
 
+  // Monta os grupos da tabela para envio (WhatsApp/PDF): indústrias com venda
+  // suspensa ficam FORA — elas só aparecem na tela de edição, para reativar.
   function montarGruposDaTabela() {
     const produtosPorIndustria = {};
     dados.produtos.forEach((p) => {
@@ -2846,12 +2855,8 @@ function PainelAdmin({ dados, setDados, onSair }) {
       { industria: null, produtos: produtosPorIndustria['sem-industria'] || [] },
     ]
       .filter((g) => g.produtos.length > 0)
-      .sort((a, b) => {
-        const suspA = grupoEstaSuspenso(a.industria, a.produtos) ? 1 : 0;
-        const suspB = grupoEstaSuspenso(b.industria, b.produtos) ? 1 : 0;
-        if (suspA !== suspB) return suspA - suspB;
-        return categoriaGrupoRank(a.produtos) - categoriaGrupoRank(b.produtos);
-      });
+      .filter((g) => !grupoEstaSuspenso(g.industria, g.produtos))
+      .sort((a, b) => categoriaGrupoRank(a.produtos) - categoriaGrupoRank(b.produtos));
   }
 
   function montarTextoTabelaAdmin() {
@@ -2859,8 +2864,7 @@ function PainelAdmin({ dados, setDados, onSair }) {
     const hoje = new Date().toLocaleDateString('pt-BR');
     let texto = `*TABELA DE PREÇOS — BRITTO LATICÍNIOS*\nAtualizada em ${hoje}\n`;
     grupos.forEach(({ industria, produtos }) => {
-      const suspensa = grupoEstaSuspenso(industria, produtos);
-      texto += `\n*${industria ? industria.nome.toUpperCase() : 'OUTROS'}*${suspensa ? ' — *VENDA SUSPENSA*' : ''}\n`;
+      texto += `\n*${industria ? industria.nome.toUpperCase() : 'OUTROS'}*\n`;
       if (industria?.regraCarga) {
         texto += `_${industria.regraCarga}_\n`;
       }
@@ -2884,14 +2888,11 @@ function PainelAdmin({ dados, setDados, onSair }) {
     linhas.push({ texto: '', tamanho: 6 });
 
     grupos.forEach(({ industria, produtos }) => {
-      const suspensa = grupoEstaSuspenso(industria, produtos);
       linhas.push({
         texto: industria ? industria.nome.toUpperCase() : 'OUTROS',
         tamanho: 12,
         negrito: true,
         cor: hexParaCorPDF(industria?.corSelo?.bg),
-        precoTexto: suspensa ? 'VENDA SUSPENSA' : undefined,
-        corPreco: '0.7 0.15 0.12',
       });
       if (industria?.regraCarga) {
         linhas.push({ texto: removerAcentos(industria.regraCarga), tamanho: 9, cor: '0.4 0.4 0.4' });
